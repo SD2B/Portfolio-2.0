@@ -130,14 +130,37 @@ nav {
 
 /* 6. Hero Section */
 #hero {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     background-color: var(--light);
+    padding-top: 70px;
 }
 
-.hero-content {
-    max-width: 800px;
+.hero-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4rem;
+}
+
+.hero-text {
+    flex: 1;
+}
+
+.hero-image {
+    flex: 0 0 350px;
+    display: flex;
+    justify-content: center;
+}
+
+.hero-image img {
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+    border-radius: 50%;
+    border: 8px solid var(--gray);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
 
 .hero-role {
@@ -164,22 +187,24 @@ nav {
 
 /* 7. About Section */
 #about .about-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1.2fr;
     align-items: center;
+    gap: 4rem;
 }
 
 .about-image img {
     width: 100%;
-    max-width: 400px;
-    border-radius: 8px;
-    filter: grayscale(100%);
-    transition: filter 0.3s;
-    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
 }
 
 .about-image img:hover {
-    filter: grayscale(0%);
+    transform: scale(1.02);
 }
+
+.rounded-lg { border-radius: 0.5rem; }
+.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
 
 /* 8. Experience Section */
 .experience-item {
@@ -347,6 +372,35 @@ nav {
     margin-bottom: 0.5rem;
 }
 
+/* 10.5 Gallery Section */
+.gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.gallery-item {
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover {
+    transform: translateY(-10px);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.1);
+}
+
 /* 11. Fun Section */
 .games-container {
     display: grid;
@@ -373,58 +427,71 @@ nav {
 /* Tic Tac Toe */
 .ttt-grid {
     display: grid;
-    grid-template-columns: repeat(3, 60px);
-    grid-template-rows: repeat(3, 60px);
-    gap: 5px;
+    grid-template-columns: repeat(3, 80px);
+    grid-template-rows: repeat(3, 80px);
+    gap: 10px;
 }
 
 .ttt-cell {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     background: var(--light);
     border: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 2rem;
     font-weight: 700;
     cursor: pointer;
+    border-radius: 8px;
 }
 
 /* Rock Paper Scissors */
 .rps-buttons {
     display: flex;
-    gap: 10px;
+    gap: 15px;
 }
 
 .rps-btn {
-    padding: 0.5rem 1rem;
+    padding: 0.8rem 1.5rem;
     background: var(--light);
     border: 1px solid var(--border);
     cursor: pointer;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.rps-btn:hover {
+    background: var(--primary);
+    color: var(--light);
 }
 
 /* Memory Game */
 .memory-grid {
     display: grid;
-    grid-template-columns: repeat(4, 40px);
-    gap: 5px;
+    grid-template-columns: repeat(4, 60px);
+    gap: 10px;
 }
 
 .memory-card {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     background: var(--primary);
     cursor: pointer;
+    border-radius: 8px;
+    transition: transform 0.3s;
 }
 
 .memory-card.flipped {
-    background: var(--accent);
-    color: white;
+    background: var(--gray);
+    color: var(--primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border: 2px solid var(--primary);
 }
 
 /* 12. Contact Section */
@@ -507,6 +574,17 @@ footer {
 }
 
 /* 15. Responsive Media Queries */
+@media (max-width: 1024px) {
+    #hero {
+        min-height: auto;
+        padding: 120px 0 80px;
+    }
+    
+    .hero-flex {
+        gap: 2rem;
+    }
+}
+
 @media (max-width: 768px) {
     h1 { font-size: 2.5rem; }
     h2 { font-size: 2rem; }
@@ -551,10 +629,21 @@ footer {
         margin-bottom: 2rem;
     }
     
-    .hero-content {
+    .hero-flex {
+        flex-direction: column;
         text-align: center;
+        gap: 2rem;
     }
-    
+
+    .hero-image {
+        flex: 0 0 auto;
+        order: -1;
+    }
+
+    .hero-image img {
+        max-width: 250px;
+    }
+
     .hero-platforms {
         justify-content: center;
     }

@@ -347,7 +347,10 @@ function initMemoryGame() {
         if (card1.dataset.symbol === card2.dataset.symbol) {
             matchedPairs++;
             if (matchedPairs === 8) {
-                alert('You won the memory game!');
+                const status = document.createElement('div');
+                status.className = 'game-status';
+                status.innerHTML = '<strong>You won the memory game!</strong>';
+                container.prepend(status);
             }
         } else {
             card1.classList.remove('flipped');
@@ -376,10 +379,17 @@ function initContactForm() {
         btn.disabled = true;
 
         setTimeout(() => {
-            alert(`Thanks ${name}! Your message has been sent (simulated).`);
+            const successMsg = document.createElement('p');
+            successMsg.style.color = 'green';
+            successMsg.style.marginTop = '1rem';
+            successMsg.innerText = `Thanks ${name}! Your message has been sent (simulated).`;
+            form.appendChild(successMsg);
+            
             form.reset();
             btn.innerText = originalText;
             btn.disabled = false;
+            
+            setTimeout(() => successMsg.remove(), 5000);
         }, 1500);
     });
 }
