@@ -6,11 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavbar();
     initSmoothScroll();
     initScrollAnimations();
+    initScrollProgress();
     initProjectDetails();
     initTicTacToe();
     initRockPaperScissors();
     initMemoryGame();
-    initContactForm();
+    if (window.lucide) lucide.createIcons();
 });
 
 // 1. Navigation
@@ -64,22 +65,43 @@ function initSmoothScroll() {
 
 // 3. Scroll Animations
 function initScrollAnimations() {
-    const reveals = document.querySelectorAll('.reveal');
+    const reveals = document.querySelectorAll('.reveal, .stagger-reveal');
     
     const revealOnScroll = () => {
         for (let i = 0; i < reveals.length; i++) {
             const windowHeight = window.innerHeight;
             const elementTop = reveals[i].getBoundingClientRect().top;
-            const elementVisible = 150;
+            const elementVisible = 100;
             
             if (elementTop < windowHeight - elementVisible) {
                 reveals[i].classList.add('active');
+                
+                // Handle staggered children if it's a stagger-reveal container
+                if (reveals[i].classList.contains('stagger-reveal')) {
+                    const children = reveals[i].children;
+                    for (let j = 0; j < children.length; j++) {
+                        children[j].style.transitionDelay = `${j * 0.1}s`;
+                    }
+                }
             }
         }
     };
     
     window.addEventListener('scroll', revealOnScroll);
     revealOnScroll(); // Initial check
+}
+
+// 3.1 Scroll Progress Bar
+function initScrollProgress() {
+    const progressBar = document.querySelector('.scroll-progress');
+    if (!progressBar) return;
+
+    window.addEventListener('scroll', () => {
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        progressBar.style.width = scrolled + "%";
+    });
 }
 
 // 3.5 Project Details (Separate Page)
@@ -363,33 +385,4 @@ function initMemoryGame() {
 }
 
 // 7. Contact Form
-function initContactForm() {
-    const form = document.getElementById('contact-form-el');
-    if (!form) return;
-
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        const name = formData.get('name');
-        
-        // Simulate form submission
-        const btn = form.querySelector('button');
-        const originalText = btn.innerText;
-        btn.innerText = 'Sending...';
-        btn.disabled = true;
-
-        setTimeout(() => {
-            const successMsg = document.createElement('p');
-            successMsg.style.color = 'green';
-            successMsg.style.marginTop = '1rem';
-            successMsg.innerText = `Thanks ${name}! Your message has been sent (simulated).`;
-            form.appendChild(successMsg);
-            
-            form.reset();
-            btn.innerText = originalText;
-            btn.disabled = false;
-            
-            setTimeout(() => successMsg.remove(), 5000);
-        }, 1500);
-    });
-}
+// Removed as per user request to use social icons instead.
