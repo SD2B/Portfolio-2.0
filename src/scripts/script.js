@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initTicTacToe();
     initRockPaperScissors();
     initMemoryGame();
+    initThemeToggle();
     if (window.lucide) lucide.createIcons();
 });
 
@@ -384,5 +385,22 @@ function initMemoryGame() {
     }
 }
 
-// 7. Contact Form
-// Removed as per user request to use social icons instead.
+// 7. Theme Toggle
+function initThemeToggle() {
+    const themeToggle = document.getElementById('theme-toggle');
+    if (!themeToggle) return;
+
+    // Check for saved theme preference or system preference
+    const savedTheme = localStorage.getItem('theme');
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const currentTheme = savedTheme || systemTheme;
+
+    // Apply initial theme
+    document.documentElement.setAttribute('data-theme', currentTheme);
+
+    themeToggle.addEventListener('click', () => {
+        const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
+}

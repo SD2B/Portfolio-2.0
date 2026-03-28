@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fun Zone | Sanoop Das M</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/src/styles/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,7 +23,13 @@
                 <li><a href="/fun.html">Fun</a></li>
                 <li><a href="/#contact">Contact</a></li>
             </ul>
-            <div class="mobile-menu-btn">Menu</div>
+            <div style="display: flex; align-items: center;">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
+                    <i data-lucide="moon" class="moon-icon"></i>
+                    <i data-lucide="sun" class="sun-icon"></i>
+                </button>
+                <div class="mobile-menu-btn">Menu</div>
+            </div>
         </nav>
     </header>
 
@@ -54,16 +60,16 @@
     <footer>
         <div class="container">
             <div class="social-links">
-                <a href="https://linkedin.com/in/sanoopdasm" target="_blank"><img src="linkedin.png" alt="LinkedIn" width="20" height="20" referrerPolicy="no-referrer"></a>
-                <a href="https://github.com/sanoopdasm" target="_blank"><img src="github.png" alt="GitHub" width="20" height="20" referrerPolicy="no-referrer"></a>
-                <a href="https://instagram.com/sanoopdasm" target="_blank"><img src="instagram.png" alt="Instagram" width="20" height="20" referrerPolicy="no-referrer"></a>
-                <a href="https://medium.com/@sanoopdasm" target="_blank"><img src="medium.png" alt="Medium" width="20" height="20" referrerPolicy="no-referrer"></a>
+                <a href="https://linkedin.com/in/sanoopdasm" target="_blank"><img src="/images/linkedin.png" alt="LinkedIn" width="20" height="20" referrerPolicy="no-referrer"></a>
+                <a href="https://github.com/sanoopdasm" target="_blank"><img src="/images/github.png" alt="GitHub" width="20" height="20" referrerPolicy="no-referrer"></a>
+                <a href="https://instagram.com/sanoopdasm" target="_blank"><img src="/images/instagram.png" alt="Instagram" width="20" height="20" referrerPolicy="no-referrer"></a>
+                <a href="https://medium.com/@sanoopdasm" target="_blank"><img src="/images/medium.png" alt="Medium" width="20" height="20" referrerPolicy="no-referrer"></a>
                 <a href="mailto:msanoopdb1@gmail.com"><i data-lucide="mail"></i></a>
             </div>
             <p>&copy; 2026 Sanoop Das M. All rights reserved.</p>
         </div>
     </footer>
 
-    <script type="module" src="/script.js"></script>
+    <script type="module" src="/src/scripts/script.js"></script>
 </body>
 </html>
