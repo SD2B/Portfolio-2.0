@@ -164,6 +164,28 @@ function initProjectDetails() {
                 'Fast execution speeds and intuitive user interface.',
                 'Secure wallet integration for crypto transactions.'
             ]
+        },
+        'sinca-leads': {
+            title: 'SincA Leads',
+            description: 'A Lead Management Software that boosted lead conversion rates by 35% through automated follow-ups and real-time analytics.',
+            details: [
+                'Built with Flutter, Dart, and Riverpod.',
+                'Backend powered by Node.js and MySQL.',
+                'Automated follow-up system to nurture leads.',
+                'Real-time analytics dashboard for performance tracking.',
+                'Efficient lead distribution and management.'
+            ]
+        },
+        'isselo': {
+            title: 'ISSELO',
+            description: 'A Restaurant Management & POS Software that integrates online and offline features to improve operational efficiency.',
+            details: [
+                'Developed using Flutter, Dart, and Riverpod.',
+                'Offline-first capability with SQLite for local storage.',
+                'MVVM architecture for clean and maintainable code.',
+                'Seamless integration of online orders and offline POS.',
+                'Inventory management and table booking features.'
+            ]
         }
     };
 
