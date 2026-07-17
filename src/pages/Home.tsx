@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Mail, Phone, Linkedin, Github, Instagram, BookOpen } from 'lucide-react';
+import { Mail, Phone, Linkedin, Github, Instagram, BookOpen, ExternalLink } from 'lucide-react';
 import { projects } from '../data/projects';
+import { getBlogs, Blog } from '../data/blogs';
 
 const Home: React.FC = () => {
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+
+  useEffect(() => {
+    setBlogs(getBlogs());
+  }, []);
+
   const revealVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: { 
@@ -297,6 +304,67 @@ const Home: React.FC = () => {
           <h2 className="section-title">Fun Zone</h2>
           <p>Take a break and play some games I've built.</p>
           <Link to="/fun" className="btn">Go to Fun Zone</Link>
+        </motion.div>
+      </section>
+
+      <section id="blog" className="section">
+        <motion.div 
+          className="container"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={revealVariants}
+        >
+          <h2 className="section-title">Latest Articles</h2>
+          <p className="section-subtitle">Insights and thoughts on Flutter, Dart, and multi-platform development.</p>
+          
+          <motion.div 
+            className="blog-grid grid"
+            variants={staggerContainer}
+          >
+            {blogs.map((blog) => (
+              <motion.div key={blog.id} variants={staggerItem}>
+                <a href={blog.url} target="_blank" rel="noopener noreferrer" className="blog-card-link">
+                  <div className="blog-card shine-effect">
+                    {blog.imageUrl && (
+                      <div className="blog-card-img-container">
+                        <img 
+                          src={blog.imageUrl} 
+                          alt={blog.title} 
+                          className="blog-card-img" 
+                          onError={(e) => {
+                            // If the image fails to load, hide or replace with placeholder
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                    )}
+                    <div className="blog-card-body">
+                      <div>
+                        <div className="blog-meta">
+                          <span>{blog.date}</span>
+                          <span className="blog-dot">&bull;</span>
+                          <span>{blog.readTime}</span>
+                        </div>
+                        <h3>{blog.title}</h3>
+                        <p>{blog.description}</p>
+                      </div>
+                      <span className="blog-link">
+                        Read on Medium <ExternalLink size={14} style={{ display: 'inline', marginLeft: '4px', verticalAlign: 'middle' }} />
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {blogs.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '3rem', background: 'var(--gray)', borderRadius: '1rem' }}>
+              <p style={{ color: 'var(--accent)', margin: 0 }}>No articles posted yet. Check back soon!</p>
+            </div>
+          )}
         </motion.div>
       </section>
 

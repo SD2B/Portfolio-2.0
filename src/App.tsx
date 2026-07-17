@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Fun from './pages/Fun';
 import ProjectDetails from './pages/ProjectDetails';
+import Admin from './pages/Admin';
 
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
@@ -33,6 +34,7 @@ const App: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/fun" element={<Fun />} />
           <Route path="/projects/:id" element={<ProjectDetails />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </Layout>
     </Router>

@@ -1164,3 +1164,114 @@ footer {
     background: var(--primary);
     transform: rotateY(180deg);
 }
+
+/* 18. Blog Section */
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+.blog-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
+
+.blog-card {
+    border: 1px solid var(--border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 1rem;
+    background: transparent;
+    overflow: hidden;
+}
+
+.blog-card:hover {
+    background: var(--primary);
+    color: var(--light);
+}
+
+.blog-card-img-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+}
+
+.blog-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.blog-card:hover .blog-card-img {
+    transform: scale(1.05);
+}
+
+.blog-card-body {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+}
+
+.blog-card:hover p {
+    color: var(--light);
+    opacity: 0.8;
+}
+
+.blog-card:hover .blog-meta {
+    color: var(--light);
+    opacity: 0.6;
+}
+
+.blog-card:hover .blog-link {
+    color: var(--light);
+    opacity: 1;
+}
+
+.blog-meta {
+    font-size: 0.85rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.blog-dot {
+    opacity: 0.5;
+}
+
+.blog-card h3 {
+    font-size: 1.25rem;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.blog-card p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+    color: var(--secondary);
+}
+
+.blog-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    opacity: 0.8;
+    color: var(--primary);
+}
