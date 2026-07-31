@@ -3,13 +3,15 @@ import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Mail, Phone, Linkedin, Github, Instagram, BookOpen, ExternalLink } from 'lucide-react';
 import { projects } from '../data/projects';
-import { getBlogs, Blog } from '../data/blogs';
+import { fetchBlogs, getBlogs, Blog } from '../data/blogs';
 
 const Home: React.FC = () => {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [blogs, setBlogs] = useState<Blog[]>(getBlogs());
 
   useEffect(() => {
-    setBlogs(getBlogs());
+    fetchBlogs().then(data => {
+      if (data) setBlogs(data);
+    });
   }, []);
 
   const revealVariants = {

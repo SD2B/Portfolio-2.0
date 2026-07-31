@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getBlogs, saveBlogs, Blog } from '../data/blogs';
+import { 
+  fetchBlogs, 
+  getBlogs, 
+  addBlogApi, 
+  updateBlogApi, 
+  deleteBlogApi, 
+  reorderBlogsApi, 
+  Blog 
+} from '../data/blogs';
 import { 
   Trash2, 
   ArrowUp, 
@@ -19,7 +27,7 @@ const Admin: React.FC = () => {
   const [pin, setPin] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState('');
-  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [blogs, setBlogs] = useState<Blog[]>(getBlogs());
   
   // Blog Form state
   const [newUrl, setNewUrl] = useState('');
@@ -41,17 +49,20 @@ const Admin: React.FC = () => {
     const authStatus = sessionStorage.getItem('admin_authenticated');
     if (authStatus === 'true') {
       setIsAuthenticated(true);
-      setBlogs(getBlogs());
+      fetchBlogs().then(data => {
+        if (data) setBlogs(data);
+      });
     }
   }, []);
 
-  const handlePinSubmit = (e: React.FormEvent) => {
+  const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const defaultPin = '0000';
     if (pin === defaultPin) {
       setIsAuthenticated(true);
       sessionStorage.setItem('admin_authenticated', 'true');
-      setBlogs(getBlogs());
+      const loaded = await fetchBlogs();
+      if (loaded) setBlogs(loaded);
       setError('');
     } else {
       setError('Incorrect PIN. Please try again.');
@@ -59,7 +70,7 @@ const Admin: React.FC = () => {
     }
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle || !newUrl) {
       setError('Title and URL are required.');
@@ -68,22 +79,16 @@ const Admin: React.FC = () => {
 
     if (editingBlogId) {
       // Update Mode
-      const updatedBlogs = blogs.map(blog => {
-        if (blog.id === editingBlogId) {
-          return {
-            ...blog,
-            title: newTitle,
-            url: newUrl,
-            description: newDescription || 'No description provided.',
-            date: newDate || new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-            readTime: newReadTime || '5 min read',
-            imageUrl: newImageUrl || undefined
-          };
-        }
-        return blog;
-      });
-      setBlogs(updatedBlogs);
-      saveBlogs(updatedBlogs);
+      const updatedData: Partial<Blog> = {
+        title: newTitle,
+        url: newUrl,
+        description: newDescription || 'No description provided.',
+        date: newDate || new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+        readTime: newReadTime || '5 min read',
+        imageUrl: newImageUrl || undefined
+      };
+      const res = await updateBlogApi(editingBlogId, updatedData);
+      setBlogs(res);
       
       // Reset Edit Mode
       setEditingBlogId(null);
@@ -99,9 +104,8 @@ const Admin: React.FC = () => {
         imageUrl: newImageUrl || undefined
       };
 
-      const updatedBlogs = [...blogs, newBlog];
-      setBlogs(updatedBlogs);
-      saveBlogs(updatedBlogs);
+      const res = await addBlogApi(newBlog);
+      setBlogs(res);
     }
     
     // Clear form fields
@@ -143,15 +147,12 @@ const Admin: React.FC = () => {
   };
 
   const confirmDelete = (id: string) => {
-    // Instead of window.confirm (which fails in browser iframe environments),
-    // we set the deletingBlogId to show a beautiful inline confirmation.
     setDeletingBlogId(id);
   };
 
-  const executeDelete = (id: string) => {
-    const updatedBlogs = blogs.filter(b => b.id !== id);
-    setBlogs(updatedBlogs);
-    saveBlogs(updatedBlogs);
+  const executeDelete = async (id: string) => {
+    const res = await deleteBlogApi(id);
+    setBlogs(res);
     setDeletingBlogId(null);
   };
 
@@ -159,24 +160,26 @@ const Admin: React.FC = () => {
     setDeletingBlogId(null);
   };
 
-  const moveUp = (index: number) => {
+  const moveUp = async (index: number) => {
     if (index === 0) return;
     const updated = [...blogs];
     const temp = updated[index];
     updated[index] = updated[index - 1];
     updated[index - 1] = temp;
     setBlogs(updated);
-    saveBlogs(updated);
+    const res = await reorderBlogsApi(updated);
+    setBlogs(res);
   };
 
-  const moveDown = (index: number) => {
+  const moveDown = async (index: number) => {
     if (index === blogs.length - 1) return;
     const updated = [...blogs];
     const temp = updated[index];
     updated[index] = updated[index + 1];
     updated[index + 1] = temp;
     setBlogs(updated);
-    saveBlogs(updated);
+    const res = await reorderBlogsApi(updated);
+    setBlogs(res);
   };
 
   const handleLogout = () => {
