@@ -29,7 +29,20 @@ const ProjectDetails: React.FC = () => {
             <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Overview</h2>
             <p style={{ fontSize: '1.1rem', lineHeight: '1.8' }}>{project.description}</p>
             
-            <h2 style={{ fontSize: '1.5rem', marginTop: '2.5rem', marginBottom: '1rem' }}>Key Features</h2>
+            {project.tech && project.tech.length > 0 && (
+              <div style={{ marginTop: '2rem' }}>
+                <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Technologies & Tools</h2>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+                  {project.tech.map((t, index) => (
+                    <span key={index} className="platform-tag shine-effect" style={{ fontSize: '0.85rem', padding: '0.35rem 0.8rem' }}>
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <h2 style={{ fontSize: '1.5rem', marginTop: '2.5rem', marginBottom: '1rem' }}>Key Features & Achievements</h2>
             <ul style={{ listStyle: 'none', padding: 0 }}>
               {project.details.map((detail, index) => (
                 <li key={index} style={{ marginBottom: '1rem', paddingLeft: '1.5rem', position: 'relative' }}>

@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Mail, Phone, Linkedin, Github, Instagram, BookOpen, ExternalLink } from 'lucide-react';
+import portraitImg from '../assets/images/profile.jpg';
 import { projects } from '../data/projects';
 import { fetchBlogs, getBlogs, Blog } from '../data/blogs';
+import { experiences, calculateExperienceStats } from '../data/experience';
 
 const Home: React.FC = () => {
   const [blogs, setBlogs] = useState<Blog[]>(getBlogs());
+  const experienceStats = useMemo(() => calculateExperienceStats(experiences), []);
 
   useEffect(() => {
     fetchBlogs().then(data => {
@@ -53,7 +56,17 @@ const Home: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <img src="images/9.jpeg" alt="Sanoop Das M" referrerPolicy="no-referrer" />
+              <div className="hero-portrait-frame">
+                <img 
+                  src={portraitImg} 
+                  alt="Sanoop Das M" 
+                  referrerPolicy="no-referrer" 
+                />
+                <div className="hero-portrait-badge">
+                  <span className="badge-dot"></span>
+                  <span>Senior Flutter Dev</span>
+                </div>
+              </div>
             </motion.div>
             <motion.div 
               className="hero-text"
@@ -87,17 +100,17 @@ const Home: React.FC = () => {
           <h2 className="section-title">About Me</h2>
           <div className="about-grid grid">
             <div className="about-text">
-              <p>I am a passionate Flutter Developer with a strong focus on creating multi-platform applications that provide a consistent and high-quality user experience. With expertise in Dart and the Flutter framework, I've successfully delivered solutions for desktop, mobile, and web environments.</p>
-              <p>My approach combines clean architecture with intuitive UI/UX design, ensuring that every project is not only functional but also a delight to use.</p>
+              <p>Senior Flutter Developer with {experienceStats.yearsFormatted} of professional experience and 50+ production apps shipped across fintech, trading, e-commerce, and ERP domains. Specializes in real-time data applications (bullion rates, forex/crypto trading, digital gold & silver holdings) with WebSocket integrations, Firebase services (Authentication, Firestore, Cloud Messaging), and end-to-end REST API integration.</p>
+              <p>Leads architecture decisions, code reviews, and reusable-component standards for development teams, and owns release management across the Google Play Store and Apple App Store. Proven track record of boosting downloads (+40%) and retention (+15%) through cross-platform delivery on Android, iOS, web, and desktop.</p>
             </div>
             <div className="about-stats">
               <div className="stat-card shine-effect">
-                <h3>2.9+</h3>
+                <h3>{experienceStats.yearsFormatted}</h3>
                 <p>Years Experience</p>
               </div>
               <div className="stat-card shine-effect">
-                <h3>20+</h3>
-                <p>Projects Completed</p>
+                <h3>50+</h3>
+                <p>Production Apps Shipped</p>
               </div>
             </div>
           </div>
@@ -114,51 +127,17 @@ const Home: React.FC = () => {
         >
           <h2 className="section-title">Experience</h2>
           <div className="timeline">
-            <div className="timeline-item">
-              <div className="timeline-dot"></div>
-              <div className="timeline-content">
-                <h3>Senior Flutter Developer</h3>
-                <span className="timeline-company">Artifitia Solutions LLP | Calicut, KL</span>
-                <span className="timeline-date">04/2026 - Present</span>
-                <p>Promoted to Senior role. Leading development practices, mentoring team members, and driving architect-level decisions for high-scale multi-platform client applications.</p>
+            {experiences.map((exp) => (
+              <div key={exp.id} className="timeline-item">
+                <div className="timeline-dot"></div>
+                <div className="timeline-content">
+                  <h3>{exp.role}</h3>
+                  <span className="timeline-company">{exp.company} | {exp.location}</span>
+                  <span className="timeline-date">{exp.startDate} - {exp.endDate}</span>
+                  <p>{exp.description}</p>
+                </div>
               </div>
-            </div>
-            <div className="timeline-item">
-              <div className="timeline-dot"></div>
-              <div className="timeline-content">
-                <h3>Flutter Developer</h3>
-                <span className="timeline-company">Artifitia Solutions LLP | Calicut, KL</span>
-                <span className="timeline-date">04/2025 - 04/2026</span>
-                <p>Maintained 50+ mobile applications across bullion tracking, e-commerce, and trading. Refactored legacy codebases and implemented standardized, robust project structures.</p>
-              </div>
-            </div>
-            <div className="timeline-item">
-              <div className="timeline-dot"></div>
-              <div className="timeline-content">
-                <h3>Software Developer</h3>
-                <span className="timeline-company">Freelance | Malappuram</span>
-                <span className="timeline-date">11/2024 - 04/2025</span>
-                <p>Developed DB-Billmate, a custom offline billing software with invoice generation, inventory management, and sales tracking using Flutter and SQLite.</p>
-              </div>
-            </div>
-            <div className="timeline-item">
-              <div className="timeline-dot"></div>
-              <div className="timeline-content">
-                <h3>Flutter Developer</h3>
-                <span className="timeline-company">Screl Info Pvt. Ltd. | KL</span>
-                <span className="timeline-date">11/2023 - 11/2024</span>
-                <p>Designed and developed cross-platform applications, boosting downloads by 40% and user retention by 15% through effective UI/UX and performance optimization.</p>
-              </div>
-            </div>
-            <div className="timeline-item">
-              <div className="timeline-dot"></div>
-              <div className="timeline-content">
-                <h3>Flutter Developer Intern</h3>
-                <span className="timeline-company">Ralfiz Technologies | KL</span>
-                <span className="timeline-date">07/2023 - 11/2023</span>
-                <p>Gained expertise in the Flutter framework and participated in all stages of the development lifecycle, from planning to deployment.</p>
-              </div>
-            </div>
+            ))}
           </div>
         </motion.div>
       </section>

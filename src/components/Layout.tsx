@@ -1,24 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Mail, Moon, Sun, Linkedin, Github, Instagram, Code, Monitor, Smartphone, Layers, Cpu, Gamepad2, Trophy, Dices, Puzzle, Joystick, Briefcase, ExternalLink, Info, Layout as LayoutIcon, Database, BookOpen } from 'lucide-react';
+import { Mail, Linkedin, Github, Instagram, Code, Monitor, Smartphone, Layers, Cpu, Gamepad2, Trophy, Dices, Puzzle, Joystick, Briefcase, ExternalLink, Info, Layout as LayoutIcon, Database, BookOpen } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const [isDark, setIsDark] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      setIsDark(true);
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
+    // Ensure clean single theme
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.removeItem('theme');
   }, []);
 
   useEffect(() => {
@@ -32,13 +29,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme ? 'dark' : 'light');
-    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
-  };
 
   const getFloatingIcons = () => {
     if (location.pathname === '/fun') {
@@ -98,7 +88,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               navigate('/admin');
             }}
           >
-            SANOOP DAS M
+            SANOOP DAS M<span className="logo-dot">.</span>
           </Link>
           <ul className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
             <li><Link to="/#hero" onClick={() => setIsMenuOpen(false)}>Home</Link></li>
@@ -111,9 +101,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <li><Link to="/#contact" onClick={() => setIsMenuOpen(false)}>Contact</Link></li>
           </ul>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle Theme">
-              {isDark ? <Sun className="sun-icon" /> : <Moon className="moon-icon" />}
-            </button>
             <div className="mobile-menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? 'Close' : 'Menu'}
             </div>

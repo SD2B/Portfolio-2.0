@@ -1,5 +1,6 @@
 {
   "name": "Sanoop Das M Portfolio",
   "description": "Personal portfolio website for Sanoop Das M, a Multi-Platform Flutter Developer.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
