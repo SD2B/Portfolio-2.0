@@ -1,121 +1,191 @@
-export interface Blog {
+// Auto-generated real Medium blog articles by Sanoop Das M (@sd2b)
+export interface BlogPost {
   id: string;
+  slug: string;
   title: string;
-  url: string;
-  description: string;
+  mediumUrl: string;
   date: string;
+  rawDate: string;
   readTime: string;
-  imageUrl?: string;
+  coverImage: string;
+  tags: string[];
+  summary: string;
+  highlights: string[];
+  contentHtml: string;
 }
 
-export const defaultBlogs: Blog[] = [];
-
-export const fetchBlogs = async (): Promise<Blog[]> => {
-  try {
-    const res = await fetch('/api/blogs');
-    if (res.ok) {
-      const data = await res.json();
-      localStorage.setItem('sanoop_blogs', JSON.stringify(data));
-      return data;
-    }
-  } catch (e) {
-    console.error('Error fetching blogs from API:', e);
+export const blogs: BlogPost[] = [
+  {
+    "id": "d2e5af7b5a74",
+    "slug": "a-practical-guide-to-isolate-run-in-flutter",
+    "title": "A Practical Guide to Isolate.run() in Flutter",
+    "mediumUrl": "https://medium.com/@sd2b/a-practical-guide-to-isolate-run-in-flutter-d2e5af7b5a74",
+    "date": "Jul 17, 2026",
+    "rawDate": "Fri, 17 Jul 2026 19:42:35 GMT",
+    "readTime": "5 min read",
+    "coverImage": "https://cdn-images-1.medium.com/max/1024/1*jVNpwwNS7H3mXnnjvAk-2w.png",
+    "tags": [
+      "Flutter UI",
+      "Flutter",
+      "Concurrency & Isolates",
+      "App Architecture"
+    ],
+    "summary": "For the longest time, I treated them as one of those “advanced Dart features” that I’d eventually learn when I needed them. Most of my apps worked fine without them, so I never gave them much attention. That changed while working on a feature that involved syncing and processi...",
+    "highlights": [
+      "For the longest time, I treated them as one of those “advanced Dart features” that I’d eventually learn when I needed them. Most of my apps worked fine without them, so I never gave them much attention.",
+      "That changed while working on a feature that involved syncing and processing a large amount of data.",
+      "The network request finished quickly. The loading indicator was visible. Everything looked normal — until the app became unresponsive for a second or two.",
+      "Like many developers, my first instinct was to blame widget rebuilds. I checked my state management, looked through my Riverpod providers, and even questioned whether SQLite was slowing things down."
+    ],
+    "contentHtml": "<figure><img alt=\"\" src=\"https://cdn-images-1.medium.com/max/1024/1*jVNpwwNS7H3mXnnjvAk-2w.png\" /></figure><h4>If you’ve been building Flutter apps for a while, you’ve probably heard about isolates. I had too.</h4><p>For the longest time, I treated them as one of those “advanced Dart features” that I’d eventually learn when I needed them. Most of my apps worked fine without them, so I never gave them much attention.</p><p>That changed while working on a feature that involved syncing and processing a large amount of data.</p><p>The network request finished quickly. The loading indicator was visible. Everything looked normal — until the app became unresponsive for a second or two.</p><p>It wasn’t crashing.</p><p>It wasn’t throwing exceptions.</p><p>It just… stopped responding.</p><p>Like many developers, my first instinct was to blame widget rebuilds. I checked my state management, looked through my Riverpod providers, and even questioned whether SQLite was slowing things down.</p><p>None of those were the issue.</p><p>After profiling the app, I realized something interesting: the UI wasn’t busy rebuilding widgets — it was busy doing work that had nothing to do with rendering the screen.</p><p>That’s when I finally understood where Isolate.run() actually fits.</p><h3>The real problem wasn’t the network request</h3><p>One misconception I had was assuming that large API responses automatically make an app feel slow.</p><p>That’s only half the story.</p><p>Imagine this:</p><pre>final response = await http.get(uri);</pre><pre>final products = (jsonDecode(response.body) as List)<br>    .map(Product.fromJson)<br>    .toList();</pre><p>The HTTP request itself is asynchronous, so it doesn’t block the UI.</p><p>The expensive part is everything that happens <strong>after</strong> the response arrives.</p><p>If you’re decoding thousands of JSON objects, creating model instances, sorting data, or running calculations, all of that happens on the main isolate by default.</p><p>While that’s happening, Flutter can’t render new frames smoothly.</p><p>The result?</p><p>Animations stutter.</p><p>Scrolling becomes janky.</p><p>Buttons feel unresponsive.</p><p>The app isn’t broken — it just feels slow.</p><h3>So what exactly does Isolate.run() do?</h3><p>The simplest way I think about it is this:</p><p>Instead of asking the UI isolate to perform heavy computation, you temporarily hand that work over to another isolate.</p><p>When it’s finished, you get the result back.</p><p>That’s literally the whole idea.</p><p>Here’s what it looks like:</p><pre>final products = await Isolate.run(() {<br>  final decoded = jsonDecode(response.body) as List;</pre><pre>  return decoded<br>      .map((e) =&gt; Product.fromJson(e))<br>      .toList();<br>});<br></pre><figure><img alt=\"\" src=\"https://cdn-images-1.medium.com/max/1024/1*cCC2PlUH3mTPuKsyYFTTEQ.png\" /></figure><p>Notice what changed.</p><p>The parsing work moved away from the isolate that’s responsible for rendering your UI.</p><p>The computation still takes time.</p><p>But your app remains responsive while it’s happening.</p><p>That’s the real benefit.</p><h3>Where I’ve found it useful</h3><p>I don’t use Isolate.run() every week.</p><p>Most features simply don’t need it.</p><p>But there are a few scenarios where I’d seriously consider it.</p><h3>1. Parsing very large JSON responses</h3><p>If you’re syncing offline data or downloading thousands of records, JSON parsing can become surprisingly expensive.</p><p>Moving that work into another isolate keeps the interface responsive while the data is processed.</p><h3>2. Image processing</h3><p>Resizing images.</p><p>Compressing photos before uploading.</p><p>Generating thumbnails.</p><p>These operations are CPU-intensive, and users immediately notice when they block the UI.</p><h3>3. Generating PDFs or reports</h3><p>Creating invoices, exporting reports, or building large PDF documents often involves a lot of computation.</p><p>It’s a perfect example of work that users don’t need happening on the UI isolate.</p><h3>4. Encryption and hashing</h3><p>Anything involving cryptography tends to be computationally expensive.</p><p>If you’re encrypting large files or generating hashes, an isolate can help keep the app responsive.</p><h3>5. Processing large collections</h3><p>Sorting huge datasets.</p><p>Generating analytics.</p><p>Aggregating transaction histories.</p><p>These are all examples where the computation itself can take longer than you’d expect.</p><h3>Where I wouldn’t use it</h3><p>This is the mistake I almost made.</p><p>When I first learned about isolates, I thought:</p><blockquote><em>“Why not move everything into </em><em>Isolate.run()?&quot;</em></blockquote><p>It sounds logical.</p><p>It’s also wrong.</p><p>For example, I wouldn’t use it for:</p><pre>await http.get(...);</pre><p>The network request is already asynchronous.</p><p>You’re mostly waiting for the server.</p><p>Moving it into another isolate doesn’t suddenly make the internet faster.</p><p>The same goes for:</p><pre>await FirebaseFirestore.instance.collection(&quot;users&quot;).get();</pre><p>or</p><pre>await database.query(...);</pre><p>These operations spend most of their time waiting on I/O rather than keeping the CPU busy.</p><p>An isolate doesn’t help much there.</p><h3>There is a cost</h3><p>One thing that surprised me was learning that Isolate.run() isn&#39;t a free performance boost.</p><p>Creating another isolate has overhead.</p><p>Data also needs to be transferred between isolates.</p><p>If the work only takes a few milliseconds, using an isolate may actually make things slower overall.</p><p>That’s why I think of Isolate.run() as a tool—not an optimization you should apply everywhere.</p><h3>The question I ask myself now</h3><p>Whenever I’m unsure, I ask one simple question:</p><p><strong>“Is this task keeping the CPU busy, or is it mostly waiting?”</strong></p><p>If it’s waiting — for the network, the database, or Firebase — I usually leave it alone.</p><p>If it’s burning CPU cycles by parsing, processing, compressing, encrypting, or calculating, then Isolate.run() becomes a good option.</p><p>That single question has helped me make much better decisions than simply memorizing a list of use cases.</p><h3>Final thoughts</h3><p>For me, learning Isolate.run() wasn&#39;t about making my code faster.</p><p>It was about making the app <em>feel</em> faster.</p><p>Users rarely care whether an operation finishes in 800 milliseconds or one second.</p><p>They absolutely notice when the UI freezes.</p><p>That’s the biggest lesson I took away.</p><p>So the next time your Flutter app feels sluggish, don’t immediately blame widget rebuilds or state management.</p><p>Open DevTools.</p><p>Profile your app.</p><p>You might discover that your UI is simply doing work it was never meant to do.</p><p>And sometimes, giving that work its own isolate is all it takes to make your app feel smooth again.</p><p><strong>Have you used </strong><strong>Isolate.run() in production? I&#39;d love to hear what kind of tasks you&#39;ve moved off the main isolate and whether it made a noticeable difference.</strong></p>"
+  },
+  {
+    "id": "c453a662de95",
+    "slug": "state-management-in-flutter-hook-stateprovider-and-asyncnotifier-with-riverpod",
+    "title": "State Management in Flutter: Hook, StateProvider, and AsyncNotifier with Riverpod",
+    "mediumUrl": "https://medium.com/@sd2b/state-management-in-flutter-hook-stateprovider-and-asyncnotifier-with-riverpod-c453a662de95",
+    "date": "Mar 25, 2025",
+    "rawDate": "Tue, 25 Mar 2025 07:51:35 GMT",
+    "readTime": "3 min read",
+    "coverImage": "https://cdn-images-1.medium.com/max/1024/1*xlyWNiRmeQf3jpuo99w4nA.png",
+    "tags": [
+      "App Architecture",
+      "Flutter",
+      "Dart",
+      "Widgets",
+      "Flutter UI"
+    ],
+    "summary": "State management is a crucial aspect of Flutter development, ensuring seamless updates to the UI as the app state changes. Among the many state management solutions, Riverpod has emerged as a robust and scalable alternative to Provider. In this article, we’ll explore how to ma...",
+    "highlights": [
+      "State management is a crucial aspect of Flutter development, ensuring seamless updates to the UI as the app state changes. Among the many state management solutions, Riverpod has emerged as a robust and scalable alternative to Provider. In this article, we’ll explore how to manage state using Riverpod’s StateProvider and AsyncNotifier, along with how Flutter Hooks can simplify widget lifecycle management.",
+      "Riverpod improves upon Provider by offering:",
+      "StateProvider is useful for managing simple state changes, such as toggling a boolean value or updating a counter.",
+      "In this example, StateProvider manages a simple counter state, which updates when the floating button is pressed."
+    ],
+    "contentHtml": "<figure><img alt=\"\" src=\"https://cdn-images-1.medium.com/max/1024/1*xlyWNiRmeQf3jpuo99w4nA.png\" /></figure><h3>Introduction</h3><p>State management is a crucial aspect of Flutter development, ensuring seamless updates to the UI as the app state changes. Among the many state management solutions, Riverpod has emerged as a robust and scalable alternative to Provider. In this article, we’ll explore how to manage state using Riverpod’s StateProvider and AsyncNotifier, along with how Flutter Hooks can simplify widget lifecycle management.</p><h3>Why Riverpod?</h3><p>Riverpod improves upon Provider by offering:</p><ul><li><strong>Global state management</strong> with a more structured approach.</li><li><strong>Compile-time safety</strong>, reducing runtime errors.</li><li><strong>AutoDispose mechanism</strong>, freeing up memory efficiently.</li><li><strong>Better support for asynchronous operations</strong>, making it ideal for working with APIs and databases.</li></ul><h3>Understanding StateProvider in Riverpod</h3><p>StateProvider is useful for managing simple state changes, such as toggling a boolean value or updating a counter.</p><h3>Example: Using StateProvider</h3><pre>import &#39;package:flutter/material.dart&#39;;<br>import &#39;package:flutter_riverpod/flutter_riverpod.dart&#39;;<br><br>final counterProvider = StateProvider&lt;int&gt;((ref) =&gt; 0);<br>void main() {<br>  runApp(ProviderScope(child: MyApp()));<br>}<br>class MyApp extends StatelessWidget {<br>  @override<br>  Widget build(BuildContext context) {<br>    return MaterialApp(<br>      home: CounterScreen(),<br>    );<br>  }<br>}<br>class CounterScreen extends ConsumerWidget {<br>  @override<br>  Widget build(BuildContext context, WidgetRef ref) {<br>    final count = ref.watch(counterProvider);<br>    return Scaffold(<br>      appBar: AppBar(title: Text(&#39;Counter Example&#39;)),<br>      body: Center(<br>        child: Text(&#39;Count: $count&#39;, style: TextStyle(fontSize: 24)),<br>      ),<br>      floatingActionButton: FloatingActionButton(<br>        onPressed: () =&gt; ref.read(counterProvider.notifier).state++,<br>        child: Icon(Icons.add),<br>      ),<br>    );<br>  }<br>}</pre><p>In this example, StateProvider manages a simple counter state, which updates when the floating button is pressed.</p><h3>AsyncNotifier: Managing Asynchronous State in Riverpod</h3><p>For handling API calls or database queries, AsyncNotifier provides an effective way to manage asynchronous state.</p><h3>Example: Using AsyncNotifier to Fetch Data</h3><pre>import &#39;package:flutter/material.dart&#39;;<br>import &#39;package:flutter_riverpod/flutter_riverpod.dart&#39;;<br>import &#39;dart:convert&#39;;<br>import &#39;package:http/http.dart&#39; as http;<br><br>final dataProvider = AsyncNotifierProvider&lt;DataNotifier, List&lt;String&gt;&gt;(DataNotifier.new);<br>class DataNotifier extends AsyncNotifier&lt;List&lt;String&gt;&gt; {<br>  @override<br>  Future&lt;List&lt;String&gt;&gt; build() async {<br>    return fetchData();<br>  }<br>  Future&lt;List&lt;String&gt;&gt; fetchData() async {<br>    final response = await http.get(Uri.parse(&#39;https://jsonplaceholder.typicode.com/posts&#39;));<br>    if (response.statusCode == 200) {<br>      List&lt;dynamic&gt; data = jsonDecode(response.body);<br>      return data.map((item) =&gt; item[&#39;title&#39;] as String).toList();<br>    } else {<br>      throw Exception(&#39;Failed to load data&#39;);<br>    }<br>  }<br>}<br>void main() {<br>  runApp(ProviderScope(child: MyApp()));<br>}<br>class MyApp extends StatelessWidget {<br>  @override<br>  Widget build(BuildContext context) {<br>    return MaterialApp(<br>      home: DataScreen(),<br>    );<br>  }<br>}<br>class DataScreen extends ConsumerWidget {<br>  @override<br>  Widget build(BuildContext context, WidgetRef ref) {<br>    final dataAsync = ref.watch(dataProvider);<br>    return Scaffold(<br>      appBar: AppBar(title: Text(&#39;AsyncNotifier Example&#39;)),<br>      body: dataAsync.when(<br>        data: (data) =&gt; ListView.builder(<br>          itemCount: data.length,<br>          itemBuilder: (context, index) =&gt; ListTile(<br>            title: Text(data[index]),<br>          ),<br>        ),<br>        loading: () =&gt; Center(child: CircularProgressIndicator()),<br>        error: (error, stack) =&gt; Center(child: Text(&#39;Error: $error&#39;)),<br>      ),<br>    );<br>  }<br>}</pre><p>Here, AsyncNotifier fetches data from an API and manages the asynchronous state seamlessly.</p><h3>Integrating Flutter Hooks with Riverpod</h3><p>Flutter Hooks simplifies stateful widget management by reducing boilerplate code. Instead of using StatefulWidget, Hooks allow developers to use stateful logic in functional components.</p><h3>Example: Using Hooks with Riverpod</h3><pre>import &#39;package:flutter/material.dart&#39;;<br>import &#39;package:flutter_hooks/flutter_hooks.dart&#39;;<br>import &#39;package:flutter_riverpod/flutter_riverpod.dart&#39;;<br><br>final counterProvider = StateProvider&lt;int&gt;((ref) =&gt; 0);<br>class HookCounterScreen extends HookConsumerWidget {<br>  @override<br>  Widget build(BuildContext context, WidgetRef ref) {<br>    final count = ref.watch(counterProvider);<br>    final animationController = useAnimationController(<br>      duration: Duration(seconds: 1),<br>    );<br>    return Scaffold(<br>      appBar: AppBar(title: Text(&#39;Hooks + Riverpod&#39;)),<br>      body: Center(<br>        child: Text(&#39;Count: $count&#39;, style: TextStyle(fontSize: 24)),<br>      ),<br>      floatingActionButton: FloatingActionButton(<br>        onPressed: () {<br>          ref.read(counterProvider.notifier).state++;<br>          animationController.forward();<br>        },<br>        child: Icon(Icons.add),<br>      ),<br>    );<br>  }<br>}</pre><p>Using Hooks, we efficiently manage animation controllers and UI state updates with Riverpod.</p><h3>Conclusion</h3><ul><li><strong>StateProvider</strong> is great for simple state management.</li><li><strong>AsyncNotifier</strong> efficiently handles asynchronous state, making API calls seamless.</li><li><strong>Flutter Hooks</strong> reduces boilerplate and simplifies stateful logic in functional components.</li></ul><p>By combining these powerful tools, Flutter developers can manage state in a clean, efficient, and scalable way. Give them a try in your next project and experience the benefits firsthand!</p>"
+  },
+  {
+    "id": "7ad895dec624",
+    "slug": "simplify-flutter-layouts-introducing-smartwrap-and-smartexpand",
+    "title": "Simplify Flutter Layouts: Introducing SmartWrap and SmartExpand",
+    "mediumUrl": "https://medium.com/@sd2b/simplify-flutter-layouts-introducing-smartwrap-and-smartexpand-7ad895dec624",
+    "date": "Jan 05, 2025",
+    "rawDate": "Sun, 05 Jan 2025 07:43:02 GMT",
+    "readTime": "3 min read",
+    "coverImage": "https://cdn-images-1.medium.com/max/1024/1*p1D495FZKB766r5chugxtA.jpeg",
+    "tags": [
+      "Flutter Web",
+      "Flutter",
+      "App Architecture",
+      "Widgets",
+      "Flutter UI"
+    ],
+    "summary": "Building responsive and maintainable UIs in Flutter can be tricky. Repeatedly switching between Row, Column, and Wrap widgets often leads to cluttered code. That’s why I created SmartWrap and SmartExpand: two widgets designed to make your layouts more intuitive, flexible, and ...",
+    "highlights": [
+      "Building responsive and maintainable UIs in Flutter can be tricky. Repeatedly switching between Row, Column, and Wrap widgets often leads to cluttered code. That’s why I created SmartWrap and SmartExpand: two widgets designed to make your layouts more intuitive, flexible, and efficient.",
+      "SmartWrap combines the functionality of Row, Column, and Wrap into a single widget with a clean and consistent API. With just one line of code, you can switch between layouts and customize alignment, spacing, and more.",
+      "Need a column layout? Change WrapType.row to WrapType.column. Want wrapping behavior? Use WrapType.wrap. It’s that simple!",
+      "Want to adapt the layout based on the platform? Here’s how you can do it:"
+    ],
+    "contentHtml": "<figure><img alt=\"\" src=\"https://cdn-images-1.medium.com/max/1024/1*p1D495FZKB766r5chugxtA.jpeg\" /></figure><p>Building responsive and maintainable UIs in Flutter can be tricky. Repeatedly switching between Row, Column, and Wrap widgets often leads to cluttered code. That’s why I created <strong>SmartWrap</strong> and <strong>SmartExpand</strong>: two widgets designed to make your layouts more intuitive, flexible, and efficient.</p><p>Here’s why you should give them a try.</p><h3>Why SmartWrap?</h3><p><strong>SmartWrap</strong> combines the functionality of Row, Column, and Wrap into a single widget with a clean and consistent API. With just one line of code, you can switch between layouts and customize alignment, spacing, and more.</p><h3>Key Features</h3><ol><li><strong>Unified Layout Management</strong>: Seamlessly switch between layout types using the WrapType enum.</li><li><strong>Customization</strong>: Control spacing, alignment, direction, and more.</li><li><strong>Simplicity</strong>: Write less code and focus on building great UIs.</li></ol><h3>Example Usage</h3><pre>SmartWrap(<br>  // Specify the layout type (Row in this case)<br>  type: WrapType.row,<br>  // Add spacing between children<br>  spacing: 10.0,<br>  // Provide the list of child widgets<br>  children: [<br>    Text(&#39;Item 1&#39;),<br>    Text(&#39;Item 2&#39;),<br>    Text(&#39;Item 3&#39;),<br>  ],<br>)</pre><p>Need a column layout? Change WrapType.row to WrapType.column. Want wrapping behavior? Use WrapType.wrap. It’s that simple!</p><h3>Platform-Based Example</h3><p>Want to adapt the layout based on the platform? Here’s how you can do it:</p><pre>import &#39;dart:io&#39;;</pre><pre>SmartWrap(<br>  // Dynamically decide the layout based on the platform<br>  type: Platform.isAndroid<br>      ? WrapType.column // Use column layout on Android<br>      : Platform.isWindows<br>          ? WrapType.row // Use row layout on Windows<br>          : WrapType.wrap, // Default to wrap layout<br>  // Add spacing between children<br>  spacing: 10.0,<br>  children: [<br>    Text(&#39;Platform-Specific Item 1&#39;),<br>    Text(&#39;Platform-Specific Item 2&#39;),<br>    Text(&#39;Platform-Specific Item 3&#39;),<br>  ],<br>)</pre><p>This dynamically adjusts the layout for Android (column), Windows (row), or other platforms (wrap).</p><h3>Why SmartExpand?</h3><p>Managing flexible child widgets within layouts is now effortless with <strong>SmartExpand</strong>. It conditionally expands its child widget, offering unparalleled flexibility without cluttering your code.</p><h3>Key Features</h3><ol><li><strong>Conditional Expansion</strong>: Easily toggle whether a widget expands.</li><li><strong>Custom Flex Factor</strong>: Adjust the flex property to control size.</li><li><strong>Clean Code</strong>: Simplify layout logic and reduce boilerplate.</li></ol><h3>Example Usage</h3><pre>SmartExpand(<br>  // The widget to expand or display<br>  child: Text(&#39;Expandable Widget&#39;),<br>  // Set to true to disable expansion<br>  disableExpand: false,<br>  // Adjust the flex factor<br>  flex: 2,<br>)</pre><p>If disableExpand is false, the widget behaves like an Expanded widget. Otherwise, it retains its default size.</p><h3>The Difference Maker</h3><p><strong>SmartWrap</strong> and <strong>SmartExpand</strong> are designed to:</p><ul><li>Simplify Flutter’s layout system.</li><li>Reduce repetitive code.</li><li>Make your UI code more readable and maintainable.</li></ul><p>These widgets are perfect for creating dynamic dashboards, forms, and reusable components with ease.</p><h3>Visual Comparison</h3><h3>◾Traditional Flutter Layout:</h3><pre>Row(<br>  children: [<br>    Expanded(<br>      // Expanding the first child<br>      child: Text(&#39;Item 1&#39;),<br>    ),<br>    // A regular child widget<br>    Text(&#39;Item 2&#39;),<br>  ],<br>)</pre><h3>◾With SmartWrap &amp; SmartExpand:</h3><pre>SmartWrap(<br>  // Use a row layout<br>  type: WrapType.row,<br>  // Add spacing between children<br>  spacing: 10.0,<br>  children: [<br>    SmartExpand(<br>      // Expanding the first child conditionally<br>      child: Text(&#39;Item 1&#39;),<br>      disableExpand: false,<br>    ),<br>    // A regular child widget<br>    Text(&#39;Item 2&#39;),<br>  ],<br>)</pre><h3>Installation</h3><ol><li>Add <strong>SmartWrap</strong> to your pubspec.yaml:</li></ol><pre>dependencies:<br>  smart_wrap: latest_version</pre><p>2. Run:</p><pre>flutter pub get</pre><p>3. Import it:</p><pre>import &#39;package:smart_wrap/smart_wrap.dart&#39;;</pre><h3>Community and Feedback</h3><p>We’re building a community of developers who love creating clean and efficient UIs. Here’s how you can get involved:</p><ul><li><strong>Star</strong> my GitHub repo.</li><li><strong>Share</strong> your feedback and feature requests.</li><li><strong>Contribute</strong> by reporting bugs or submitting pull requests.</li></ul><p><a href=\"https://github.com/SD2B/smart_wrap\">Explore SmartWrap on GitHub</a><br><a href=\"https://pub.dev/packages/smart_wrap\">Find SmartWrap on pub.dev</a></p><h3>Closing Thoughts</h3><p>SmartWrap and SmartExpand are more than just widgets — they’re your new best friends for building layouts in Flutter. By simplifying layout logic, these tools save you time and make your code cleaner.</p><p>Install <a href=\"https://pub.dev/packages/smart_wrap\"><strong>SmartWrap</strong> </a>today and experience a new level of Flutter development. Share your thoughts and join the journey to create smarter layouts!</p>"
+  },
+  {
+    "id": "7e696946c4d3",
+    "slug": "using-freezed-for-data-modeling-in-flutter",
+    "title": "Using Freezed for Data Modeling in Flutter",
+    "mediumUrl": "https://medium.com/@sd2b/using-freezed-for-data-modeling-in-flutter-7e696946c4d3",
+    "date": "Dec 19, 2024",
+    "rawDate": "Thu, 19 Dec 2024 06:29:10 GMT",
+    "readTime": "2 min read",
+    "coverImage": "https://cdn-images-1.medium.com/max/1024/1*hazvR8EoDW_5rvQytscE9Q.jpeg",
+    "tags": [
+      "Dart",
+      "Data Modeling",
+      "App Architecture",
+      "Freezed",
+      "Flutter"
+    ],
+    "summary": "Data modeling is a critical aspect of application development. It allows you to structure your data in a manageable and scalable way. In Flutter, Freezed is a powerful package that simplifies the creation of immutable data classes. It saves time and ensures that your code is c...",
+    "highlights": [
+      "Data modeling is a critical aspect of application development. It allows you to structure your data in a manageable and scalable way. In Flutter, Freezed is a powerful package that simplifies the creation of immutable data classes. It saves time and ensures that your code is clean and free from boilerplate.",
+      "Freezed is a Dart package that generates immutable classes with support for union types, copyWith functionality, and JSON serialization. It is highly compatible with Flutter projects and integrates seamlessly with other packages like json_serializable.",
+      "Here is a step-by-step guide to using Freezed for data modeling in a Flutter project:",
+      "◾Add Dependencies Add the required dependencies to your pubspec.yaml file:"
+    ],
+    "contentHtml": "<p>Data modeling is a critical aspect of application development. It allows you to structure your data in a manageable and scalable way. In Flutter, Freezed is a powerful package that simplifies the creation of immutable data classes. It saves time and ensures that your code is clean and free from boilerplate.</p><figure><img alt=\"\" src=\"https://cdn-images-1.medium.com/max/1024/1*hazvR8EoDW_5rvQytscE9Q.jpeg\" /></figure><h4>What is Freezed?</h4><p>Freezed is a Dart package that generates immutable classes with support for union types, copyWith functionality, and JSON serialization. It is highly compatible with Flutter projects and integrates seamlessly with other packages like json_serializable.</p><h4>Why Use Freezed for Data Modeling?</h4><ol><li><strong>Immutability</strong>: Freezed generates classes that are immutable by default, which makes your data safer and less prone to unintended changes.</li><li><strong>Boilerplate Reduction</strong>: No need to manually write copyWith methods, equality operators, or hashCode implementations.</li><li><strong>JSON Serialization</strong>: Freezed works well with json_serializable, making it easy to serialize and deserialize data.</li><li><strong>Union Types</strong>: Create sealed classes to represent complex data structures or states, useful for state management.</li></ol><h4>How to Get Started with Freezed</h4><p>Here is a step-by-step guide to using Freezed for data modeling in a Flutter project:</p><p><strong>◾Add Dependencies</strong> Add the required dependencies to your pubspec.yaml file:</p><pre>dependencies:<br>  freezed_annotation: ^2.2.0<br><br>dev_dependencies:<br>  build_runner: ^2.4.0<br>  freezed: ^2.3.0</pre><p><strong>◾Create a Model Class</strong> Create a Dart file for your data model and annotate it with @freezed. For example:</p><pre>import &#39;package:freezed_annotation/freezed_annotation.dart&#39;;<br><br>part &#39;user.freezed.dart&#39;;<br>part &#39;user.g.dart&#39;;<br><br>@freezed<br>class User with _$User {<br>  const factory User({<br>    required String id,<br>    required String name,<br>    String? email,<br>  }) = _User;<br><br>  factory User.fromJson(Map&lt;String, dynamic&gt; json) =&gt; _$UserFromJson(json);<br>}</pre><p><strong>◾Run the Code Generator</strong> Use the build_runner package to generate the necessary files:</p><pre>flutter pub run build_runner build --delete-conflicting-outputs</pre><p>or</p><pre>dart run build_runner build --delete-conflicting-outputs</pre><p>This generates the user.freezed.dart and user.g.dart files, which include the implementation of your model class.</p><p><strong>◾Using the Generated Model</strong> You can now use the User class in your project:</p><pre>void main() {<br>  // Creating a User instance<br>  final user = User(id: &#39;1&#39;, name: &#39;John Doe&#39;, email: &#39;john.doe@example.com&#39;);<br><br>  // Copying and modifying the instance<br>  final updatedUser = user.copyWith(name: &#39;Jane Doe&#39;);<br><br>  // Serializing to JSON<br>  final json = user.toJson();<br><br>  // Deserializing from JSON<br>  final newUser = User.fromJson(json);<br><br>  print(updatedUser); // Output: User(id: 1, name: Jane Doe, email: john.doe@example.com)<br>}</pre><h4>Key Features of Freezed</h4><ul><li><strong>Union Types</strong>: Useful for representing multiple types of data in one model.</li></ul><pre>@freezed<br>class Result with _$Result {<br>  const factory Result.success(String data) = Success;<br>  const factory Result.error(String message) = Error;<br>}</pre><ul><li><strong>Deep Copying</strong>: The copyWith method allows for immutability while making updates easy.</li><li><strong>Integration with JSON</strong>: Combine Freezed with json_serializable to streamline JSON parsing.</li></ul><h4>Conclusion</h4><p>Freezed is an invaluable tool for Flutter developers aiming to write clean, maintainable, and efficient code. By automating repetitive tasks and providing advanced features like union types, Freezed allows you to focus on the logic of your application rather than boilerplate code. If you haven’t tried it yet, give it a shot in your next project and experience the productivity boost it offers.</p>"
+  },
+  {
+    "id": "1c28bc0d85c9",
+    "slug": "measuring-employee-performance-by-github-commits-why-its-misguided",
+    "title": "Measuring Employee Performance by GitHub Commits: Why It’s Misguided",
+    "mediumUrl": "https://medium.com/@sd2b/measuring-employee-performance-by-github-commits-why-its-misguided-1c28bc0d85c9",
+    "date": "Dec 05, 2024",
+    "rawDate": "Thu, 05 Dec 2024 15:47:12 GMT",
+    "readTime": "3 min read",
+    "coverImage": "https://cdn-images-1.medium.com/max/1024/1*EYuYR8YzCWQ6JcI_XhVepA.png",
+    "tags": [
+      "Engineering Metrics",
+      "Leadership",
+      "Developer Experience",
+      "Best Practices",
+      "Software Engineering"
+    ],
+    "summary": "Imagine this: a developer adds a space to their code, commits it to GitHub, and suddenly, their commit count ticks up. Does this mean they’re productive? Of course not! Yet, some companies still use the number of commits as a key metric for evaluating developer performance. Th...",
+    "highlights": [
+      "Imagine this: a developer adds a space to their code, commits it to GitHub, and suddenly, their commit count ticks up. Does this mean they’re productive? Of course not! Yet, some companies still use the number of commits as a key metric for evaluating developer performance.",
+      "This practice not only misunderstands the nature of software development but also fosters harmful behaviors that degrade team performance. Let’s dive into why this metric is flawed and what we should focus on instead.",
+      "Would you prefer 10 messy, rushed commits or one well-thought-out, clean solution? The truth is, software development isn’t about churning out code — it’s about solving problems effectively.",
+      "Counting commits incentivizes quick, frequent changes that may lack depth or consideration. A single well-crafted commit can accomplish more than dozens of trivial ones."
+    ],
+    "contentHtml": "<figure><img alt=\"\" src=\"https://cdn-images-1.medium.com/max/1024/1*EYuYR8YzCWQ6JcI_XhVepA.png\" /></figure><p>Imagine this: a developer adds a space to their code, commits it to GitHub, and suddenly, their commit count ticks up. Does this mean they’re productive? Of course not! Yet, some companies still use the number of commits as a key metric for evaluating developer performance.</p><p>This practice not only misunderstands the nature of software development but also fosters harmful behaviors that degrade team performance. Let’s dive into why this metric is flawed and what we should focus on instead.</p><h3>1. Quantity Over Quality: A False Metric</h3><p>Would you prefer 10 messy, rushed commits or one well-thought-out, clean solution? The truth is, software development isn’t about churning out code — it’s about solving problems effectively.</p><p>Counting commits incentivizes quick, frequent changes that may lack depth or consideration. A single well-crafted commit can accomplish more than dozens of trivial ones.</p><h3>2. Developers Are More Than Code Machines</h3><p>The true value of a developer goes beyond code. Great developers:</p><ul><li>Solve complex problems that require creativity and patience.</li><li>Mentor their teammates, helping others grow and succeed.</li><li>Design systems that are scalable, maintainable, and future-proof.</li><li>Review code to maintain quality across the team.</li></ul><p>None of these critical contributions show up in a commit count, yet they are the backbone of a successful development team.</p><h3>3. Chasing Numbers Encourages Bad Habits</h3><p>When metrics like commit counts become the focus, developers may:</p><ul><li>Split tasks unnecessarily to inflate their numbers.</li><li>Push unfinished or low-quality code to “look busy.”</li><li>Neglect collaboration in favor of individual output.</li></ul><p>This creates a toxic environment where numbers matter more than impact, leading to inefficiency and technical debt.</p><h3>4. Even Tiny Edits Count — But Should They?</h3><p>Fixing a typo or adding a space generates a commit, but does that really reflect productivity? Counting every tiny change skews the data and paints an incomplete picture of a developer’s contributions.</p><h3>5. Complex Work Doesn’t Show in Commits</h3><p>Some of the most valuable tasks in software development — debugging, refactoring, or architecting complex systems — take time and often result in fewer commits. Should we undervalue these contributions simply because they don’t produce a flood of changes?</p><h3>What Should We Measure Instead?</h3><p>If GitHub commits are misleading, what metrics should we use to measure developer performance? Here are a few ideas:</p><ul><li><strong>Impact:</strong> Did the developer solve a critical issue or deliver a valuable feature?</li><li><strong>Collaboration:</strong> How well do they work with teammates? Are they mentoring others?</li><li><strong>Code Quality:</strong> Is their code maintainable, efficient, and free of bugs?</li><li><strong>Problem-Solving:</strong> Are they tackling complex challenges and finding effective solutions?</li><li><strong>Customer Value:</strong> Does their work align with business goals and user needs?</li></ul><p>These metrics are harder to quantify, but they reflect the real value a developer brings to the team.</p><h3>Conclusion: Focus on the Big Picture</h3><p>Productivity isn’t about counting commits — it’s about creating impact, fostering collaboration, and solving real problems. Let’s stop reducing developers to numbers and start appreciating the many ways they contribute to team success.</p><p><strong>What’s your take? Have you ever been judged by a meaningless metric? Share your thoughts in the comments — I’d love to hear your perspective!</strong></p><p><em>Tags: Software Development, GitHub, Productivity, Team Leadership, Developer Metrics, Coding Culture</em></p>"
+  },
+  {
+    "id": "8b771e7bce0a",
+    "slug": "understanding-the-single-thread-issue-in-flutter-and-how-to-overcome-it",
+    "title": "Understanding the Single-Thread Issue in Flutter and How to Overcome It",
+    "mediumUrl": "https://medium.com/@sd2b/understanding-the-single-thread-issue-in-flutter-and-how-to-overcome-it-8b771e7bce0a",
+    "date": "Nov 24, 2024",
+    "rawDate": "Sun, 24 Nov 2024 14:51:50 GMT",
+    "readTime": "3 min read",
+    "coverImage": "https://cdn-images-1.medium.com/max/1024/1*KYZWTvIXdMg3ewg1q-j4Vw.png",
+    "tags": [
+      "Concurrency & Isolates",
+      "Flutter",
+      "Dart",
+      "Software Engineering"
+    ],
+    "summary": "Flutter has been a game-changer in app development, offering a single codebase for multiple platforms and an amazing UI-building experience. However, like every technology, it comes with its own set of challenges — one of them being the single-thread nature of Dart. In this ar...",
+    "highlights": [
+      "Flutter has been a game-changer in app development, offering a single codebase for multiple platforms and an amazing UI-building experience. However, like every technology, it comes with its own set of challenges — one of them being the single-thread nature of Dart.",
+      "In this article, I want to dive deeper into this topic, covering:",
+      "Flutter uses Dart as its underlying programming language. Dart runs most of its operations, including UI rendering and logic, on a single main thread (also known as the UI thread). This can create performance bottlenecks when heavy tasks are executed on the same thread, such as:",
+      "When the main thread is overloaded, the app becomes sluggish, and users experience issues like lagging or unresponsiveness."
+    ],
+    "contentHtml": "<figure><img alt=\"\" src=\"https://cdn-images-1.medium.com/max/1024/1*KYZWTvIXdMg3ewg1q-j4Vw.png\" /></figure><p>Flutter has been a game-changer in app development, offering a <strong>single codebase</strong> for multiple platforms and an amazing UI-building experience. However, like every technology, it comes with its own set of challenges — one of them being the <strong>single-thread nature of Dart</strong>.</p><p>In this article, I want to dive deeper into this topic, covering:</p><ol><li><strong>What is the single-thread issue?</strong></li><li><strong>How it impacts app performance</strong></li><li><strong>Best practices to address it</strong></li><li><strong>Code examples</strong></li></ol><h3>1. What is the Single-Thread Issue in Flutter?</h3><p>Flutter uses Dart as its underlying programming language. Dart runs most of its operations, including UI rendering and logic, on a <strong>single main thread</strong> (also known as the UI thread). This can create performance bottlenecks when heavy tasks are executed on the same thread, such as:</p><ul><li><strong>Intensive computations</strong> (e.g., sorting or complex calculations)</li><li><strong>Large data processing</strong> (e.g., parsing or encoding a large JSON file)</li><li><strong>Rendering resource-heavy animations</strong></li></ul><p>When the main thread is overloaded, the app becomes sluggish, and users experience issues like lagging or unresponsiveness.</p><h3>2. How Does This Impact App Performance?</h3><p>Here are some examples where the single-thread issue can affect your app:</p><h3>Heavy Computation</h3><p>Running calculations or data manipulations on the main thread can cause noticeable delays in UI updates.</p><h3>Large Data Parsing</h3><p>If you decode large JSON files synchronously, it can block the main thread and cause the app to freeze.</p><h3>Intensive Animations</h3><p>Complex animations can compete with other main thread tasks, resulting in stuttering.</p><h3>File I/O and Network Operations</h3><p>Performing these tasks synchronously instead of asynchronously can make the UI unresponsive.</p><h3>3. How to Overcome the Single-Thread Issue in Flutter?</h3><p>Flutter provides multiple strategies to address this problem. Here are some practical solutions:</p><h3>A) Using Asynchronous Programming</h3><p>Always use async and await for tasks like API calls, database queries, and file I/O. This ensures the main thread isn&#39;t blocked.</p><pre>Future&lt;void&gt; fetchData() async {<br>  final response = await http.get(Uri.parse(&#39;https://api.example.com/data&#39;));<br>  print(response.body); // Keeps the UI responsive<br>}</pre><h3>B) Offloading Work to Isolates</h3><p>Dart’s <strong>isolates</strong> let you run tasks on separate threads, avoiding main thread interference.</p><h4>Example: Using compute()</h4><p>Flutter’s compute() function is a quick way to leverage isolates for heavy tasks like JSON decoding.</p><pre>import &#39;dart:convert&#39;;<br>import &#39;package:flutter/foundation.dart&#39;;<br><br>Future&lt;List&lt;dynamic&gt;&gt; parseJson(String jsonString) async {<br>  return compute(_parseAndReturn, jsonString);<br>}<br><br>List&lt;dynamic&gt; _parseAndReturn(String jsonString) {<br>  return json.decode(jsonString) as List&lt;dynamic&gt;;<br>}<br><br>void main() async {<br>  String jsonString = &#39;[{&quot;id&quot;:1,&quot;name&quot;:&quot;Flutter&quot;},{&quot;id&quot;:2,&quot;name&quot;:&quot;Dart&quot;}]&#39;;<br>  List&lt;dynamic&gt; data = await parseJson(jsonString);<br>  print(data);<br>}</pre><h3>C) Breaking Down Large Tasks</h3><p>Instead of handling massive operations in one go, divide them into smaller chunks using Future.delayed() or Timer.</p><h4>Example: Processing Data in Chunks</h4><pre>void processLargeData(List&lt;int&gt; data) {<br>  int chunkSize = 1000;<br>  for (int i = 0; i &lt; data.length; i += chunkSize) {<br>    Future.delayed(Duration.zero, () {<br>      List&lt;int&gt; chunk = data.sublist(i, i + chunkSize);<br>      print(&#39;Processing chunk: $chunk&#39;);<br>    });<br>  }<br>}</pre><h3>D) Leveraging Background Plugins</h3><p>Plugins like flutter_isolate and workmanager help execute tasks efficiently in the background.</p><h4>Example: Using flutter_isolate</h4><pre>import &#39;package:flutter_isolate/flutter_isolate.dart&#39;;<br><br>void backgroundTask(String message) {<br>  print(&#39;Running background task: $message&#39;);<br>}<br><br>void main() async {<br>  FlutterIsolate.spawn(backgroundTask, &quot;Hello from the isolate!&quot;);<br>}</pre><h3>E) Optimize Rendering</h3><p>Minimize unnecessary widget rebuilds by:</p><ul><li>Using const constructors where possible.</li><li>Wrapping widgets with RepaintBoundary to limit repaints.</li></ul><h3>4. Best Practices for Managing the Main Thread</h3><p>Here are some tips I follow to avoid blocking the UI thread:</p><p>1️⃣ <strong>Keep Everything Non-Blocking</strong><br>Ensure all I/O, network, and database tasks are asynchronous.</p><p>2️⃣ <strong>Use Isolates Wisely</strong><br>Offload CPU-intensive operations to isolates using compute() or custom isolate implementations.</p><p>3️⃣ <strong>Monitor Performance with Flutter DevTools</strong><br>Use the <strong>Flutter DevTools</strong> to identify performance bottlenecks and optimize them.</p><p>4️⃣ <strong>Chunk Data Processing</strong><br>Break large tasks into manageable pieces that can run incrementally.</p><p>5️⃣ <strong>Test on Real Devices</strong><br>Test your app on various devices with different performance capabilities to ensure smoothness.</p><h3>5. Wrapping Up</h3><p>Flutter’s <strong>single-thread issue</strong> is a well-known limitation, but it’s not a dealbreaker. By understanding how it works and using tools like isolates, async programming, and plugins, you can build high-performing apps that offer smooth, responsive user experiences.</p><p>Have you faced the single-thread issue in your Flutter projects? I’d love to hear how you tackled it — drop your experiences in the comments!</p>"
+  },
+  {
+    "id": "8eb4460d7f1d",
+    "slug": "dynamic-ui-generation-in-flutter-using-json-based-configurations",
+    "title": "Dynamic UI Generation in Flutter Using JSON-Based Configurations",
+    "mediumUrl": "https://medium.com/@sd2b/dynamic-ui-generation-in-flutter-using-json-based-configurations-8eb4460d7f1d",
+    "date": "Nov 16, 2024",
+    "rawDate": "Sat, 16 Nov 2024 16:31:49 GMT",
+    "readTime": "4 min read",
+    "coverImage": "https://cdn-images-1.medium.com/max/1024/1*F7bih11t5WoziUUu6uijAQ.jpeg",
+    "tags": [
+      "Dynamic UI",
+      "Server-Driven UI",
+      "Dynamic Layouts",
+      "Dart",
+      "Flutter"
+    ],
+    "summary": "This documentation explores how Flutter can dynamically generate UI layouts from JSON configurations. By separating UI logic from application logic, this approach enables flexibility, faster iteration cycles, and reduced app update requirements. The document also provides a st...",
+    "highlights": [
+      "This documentation explores how Flutter can dynamically generate UI layouts from JSON configurations. By separating UI logic from application logic, this approach enables flexibility, faster iteration cycles, and reduced app update requirements. The document also provides a step-by-step guide, including the theoretical foundation, implementation process, code examples, and use cases.",
+      "Dynamic UI generation refers to the creation of user interfaces at runtime based on external configuration files, such as JSON. This technique is particularly useful in scenarios where frequent UI changes are required without modifying the app’s core code.",
+      "A well-defined JSON schema is essential for consistency. Below is an example:",
+      "Create a model to parse JSON data into Flutter objects:"
+    ],
+    "contentHtml": "<h4>Abstract</h4><p>This documentation explores how Flutter can dynamically generate UI layouts from JSON configurations. By separating UI logic from application logic, this approach enables flexibility, faster iteration cycles, and reduced app update requirements. The document also provides a step-by-step guide, including the theoretical foundation, implementation process, code examples, and use cases.</p><figure><img alt=\"\" src=\"https://cdn-images-1.medium.com/max/1024/1*F7bih11t5WoziUUu6uijAQ.jpeg\" /></figure><h3>1. Introduction</h3><h4>1.1 Overview</h4><p>Dynamic UI generation refers to the creation of user interfaces at runtime based on external configuration files, such as JSON. This technique is particularly useful in scenarios where frequent UI changes are required without modifying the app’s core code.</p><h4>1.2 Benefits</h4><ul><li><strong>Flexibility</strong>: Easy to update UI without requiring app updates.</li><li><strong>Scalability</strong>: Centralized control over UI elements for multiple apps or versions.</li><li><strong>Cost Efficiency</strong>: Reduces development and deployment overhead.</li></ul><h4>1.3 Use Cases</h4><ul><li>Content Management Systems (CMS)</li><li>E-commerce platforms with customizable product layouts</li><li>Survey and form-based applications</li><li>News or blog apps</li></ul><h3>2. Architecture</h3><h4>2.1 System Flow</h4><ol><li><strong>JSON Source</strong>: The app fetches JSON configuration from a server or local file.</li><li><strong>Parser</strong>: The JSON is parsed to extract UI structure and widget properties.</li><li><strong>Widget Generator</strong>: Flutter dynamically generates widgets based on parsed data.</li><li><strong>Render Engine</strong>: The widgets are rendered on the screen.</li></ol><h4>2.2 Key Components</h4><ul><li><strong>Backend</strong>: Generates and serves JSON configurations.</li><li><strong>Parser</strong>: Converts JSON into a Flutter-readable format.</li><li><strong>UI Builder</strong>: Creates Flutter widgets from parsed JSON data.</li></ul><h3>3. JSON Schema for UI</h3><p>A well-defined JSON schema is essential for consistency. Below is an example:</p><pre>{<br>  &quot;type&quot;: &quot;Column&quot;,<br>  &quot;children&quot;: [<br>    {<br>      &quot;type&quot;: &quot;Text&quot;,<br>      &quot;data&quot;: &quot;Welcome to Dynamic UI!&quot;,<br>      &quot;style&quot;: {<br>        &quot;fontSize&quot;: 20,<br>        &quot;color&quot;: &quot;#FF5733&quot;,<br>        &quot;fontWeight&quot;: &quot;bold&quot;<br>      }<br>    },<br>    {<br>      &quot;type&quot;: &quot;Image&quot;,<br>      &quot;url&quot;: &quot;https://example.com/welcome.png&quot;,<br>      &quot;fit&quot;: &quot;contain&quot;<br>    },<br>    {<br>      &quot;type&quot;: &quot;Button&quot;,<br>      &quot;text&quot;: &quot;Click Me&quot;,<br>      &quot;onPressed&quot;: &quot;https://example.com/action&quot;<br>    }<br>  ]<br>}</pre><h3>4. Implementation</h3><h4>4.1 Setting Up the Project</h4><ol><li><strong>Create a Flutter project</strong>:</li></ol><pre>flutter create dynamic_ui<br>cd dynamic_ui</pre><ol><li><strong>Add dependencies:</strong></li></ol><pre>dependencies:<br>  flutter:<br>    sdk: flutter<br>  http: ^0.15.0<br>  json_annotation: ^4.8.0</pre><h4>4.2 Parsing JSON</h4><p>Create a model to parse JSON data into Flutter objects:</p><pre>import &#39;package:flutter/material.dart&#39;;</pre><pre>class DynamicWidget {<br>  final String type;<br>  final Map&lt;String, dynamic&gt;? properties;<br>  final List&lt;DynamicWidget&gt;? children;</pre><pre>  DynamicWidget({<br>    required this.type,<br>    this.properties,<br>    this.children,<br>  });</pre><pre>  factory DynamicWidget.fromJson(Map&lt;String, dynamic&gt; json) {<br>    return DynamicWidget(<br>      type: json[&#39;type&#39;],<br>      properties: json[&#39;properties&#39;],<br>      children: json[&#39;children&#39;] != null<br>          ? (json[&#39;children&#39;] as List)<br>              .map((child) =&gt; DynamicWidget.fromJson(child))<br>              .toList()<br>          : null,<br>    );<br>  }<br>}</pre><h4>4.3 Widget Builder</h4><p>Implement a widget builder function:</p><pre>Widget buildDynamicWidget(DynamicWidget widget) {<br>  switch (widget.type) {<br>    case &#39;Text&#39;:<br>      return Text(<br>        widget.properties?[&#39;data&#39;] ?? &#39;&#39;,<br>        style: TextStyle(<br>          fontSize: widget.properties?[&#39;style&#39;]?[&#39;fontSize&#39;]?.toDouble(),<br>          color: Color(int.parse(<br>              widget.properties?[&#39;style&#39;]?[&#39;color&#39;]?.replaceFirst(&#39;#&#39;, &#39;0xFF&#39;))),<br>          fontWeight: widget.properties?[&#39;style&#39;]?[&#39;fontWeight&#39;] == &#39;bold&#39;<br>              ? FontWeight.bold<br>              : FontWeight.normal,<br>        ),<br>      );<br>    case &#39;Image&#39;:<br>      return Image.network(<br>        widget.properties?[&#39;url&#39;] ?? &#39;&#39;,<br>        fit: widget.properties?[&#39;fit&#39;] == &#39;contain&#39;<br>            ? BoxFit.contain<br>            : BoxFit.cover,<br>      );<br>    case &#39;Button&#39;:<br>      return ElevatedButton(<br>        onPressed: () {<br>          // Perform action based on URL or callback<br>        },<br>        child: Text(widget.properties?[&#39;text&#39;] ?? &#39;&#39;),<br>      );<br>    case &#39;Column&#39;:<br>      return Column(<br>        children: widget.children<br>                ?.map((child) =&gt; buildDynamicWidget(child))<br>                .toList() ??<br>            [],<br>      );<br>    default:<br>      return SizedBox.shrink();<br>  }<br>}</pre><h4>4.4 Rendering the UI</h4><p>Fetch and render the JSON-based UI:</p><pre>import &#39;dart:convert&#39;;<br>import &#39;package:flutter/material.dart&#39;;<br>import &#39;package:http/http.dart&#39; as http;</pre><pre>class DynamicUIScreen extends StatefulWidget {<br>  @override<br>  _DynamicUIScreenState createState() =&gt; _DynamicUIScreenState();<br>}</pre><pre>class _DynamicUIScreenState extends State&lt;DynamicUIScreen&gt; {<br>  late Future&lt;DynamicWidget&gt; _uiConfig;</pre><pre>  Future&lt;DynamicWidget&gt; fetchUIConfig() async {<br>    final response =<br>        await http.get(Uri.parse(&#39;https://example.com/ui-config.json&#39;));</pre><pre>    if (response.statusCode == 200) {<br>      return DynamicWidget.fromJson(jsonDecode(response.body));<br>    } else {<br>      throw Exception(&#39;Failed to load UI configuration&#39;);<br>    }<br>  }</pre><pre>  @override<br>  void initState() {<br>    super.initState();<br>    _uiConfig = fetchUIConfig();<br>  }</pre><pre>  @override<br>  Widget build(BuildContext context) {<br>    return Scaffold(<br>      appBar: AppBar(title: Text(&#39;Dynamic UI&#39;)),<br>      body: FutureBuilder&lt;DynamicWidget&gt;(<br>        future: _uiConfig,<br>        builder: (context, snapshot) {<br>          if (snapshot.connectionState == ConnectionState.waiting) {<br>            return Center(child: CircularProgressIndicator());<br>          } else if (snapshot.hasError) {<br>            return Center(child: Text(&#39;Error loading UI&#39;));<br>          } else if (snapshot.hasData) {<br>            return buildDynamicWidget(snapshot.data!);<br>          } else {<br>            return Center(child: Text(&#39;No data available&#39;));<br>          }<br>        },<br>      ),<br>    );<br>  }<br>}</pre><h3>5. Advanced Enhancements</h3><ul><li><strong>State Management</strong>: Integrate Riverpod or Provider to manage dynamic state.</li><li><strong>Custom Widgets</strong>: Extend the builder to include complex widgets like forms, charts, or maps.</li><li><strong>Performance Optimization</strong>: Cache parsed JSON or widgets for better performance.</li><li><strong>Error Handling</strong>: Provide graceful fallbacks for missing or incorrect JSON properties.</li></ul><h3>6. Challenges and Solutions</h3><ul><li><strong>Performance</strong>: Optimize widget tree depth and reuse widgets.</li><li><strong>Security</strong>: Validate JSON to prevent malicious data injection.</li><li><strong>Scalability</strong>: Modularize the widget builder for ease of extension.</li></ul><h3>7. Conclusion</h3><p>Dynamic UI generation in Flutter is a game-changing approach for building flexible, scalable, and easy-to-maintain applications. By leveraging JSON configurations, developers can significantly reduce app update cycles and improve user experience.</p>"
   }
-  return getBlogs();
-};
-
-export const addBlogApi = async (blog: Blog): Promise<Blog[]> => {
-  try {
-    const res = await fetch('/api/blogs', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(blog)
-    });
-    if (res.ok) {
-      const data = await res.json();
-      localStorage.setItem('sanoop_blogs', JSON.stringify(data));
-      return data;
-    }
-  } catch (e) {
-    console.error('Error adding blog via API:', e);
-  }
-  const current = getBlogs();
-  const updated = [...current, blog];
-  saveBlogs(updated);
-  return updated;
-};
-
-export const updateBlogApi = async (id: string, blog: Partial<Blog>): Promise<Blog[]> => {
-  try {
-    const res = await fetch(`/api/blogs/${encodeURIComponent(id)}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(blog)
-    });
-    if (res.ok) {
-      const data = await res.json();
-      localStorage.setItem('sanoop_blogs', JSON.stringify(data));
-      return data;
-    }
-  } catch (e) {
-    console.error('Error updating blog via API:', e);
-  }
-  const current = getBlogs();
-  const updated = current.map(b => b.id === id ? { ...b, ...blog } : b);
-  saveBlogs(updated);
-  return updated;
-};
-
-export const deleteBlogApi = async (id: string): Promise<Blog[]> => {
-  try {
-    const res = await fetch(`/api/blogs/${encodeURIComponent(id)}`, {
-      method: 'DELETE'
-    });
-    if (res.ok) {
-      const data = await res.json();
-      localStorage.setItem('sanoop_blogs', JSON.stringify(data));
-      return data;
-    }
-  } catch (e) {
-    console.error('Error deleting blog via API:', e);
-  }
-  const current = getBlogs();
-  const updated = current.filter(b => b.id !== id);
-  saveBlogs(updated);
-  return updated;
-};
-
-export const reorderBlogsApi = async (blogs: Blog[]): Promise<Blog[]> => {
-  try {
-    const res = await fetch('/api/blogs/reorder', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ blogs })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      localStorage.setItem('sanoop_blogs', JSON.stringify(data));
-      return data;
-    }
-  } catch (e) {
-    console.error('Error reordering blogs via API:', e);
-  }
-  saveBlogs(blogs);
-  return blogs;
-};
-
-export const getBlogs = (): Blog[] => {
-  const saved = localStorage.getItem('sanoop_blogs');
-  if (saved) {
-    try {
-      return JSON.parse(saved);
-    } catch (e) {
-      console.error('Error parsing blogs', e);
-    }
-  }
-  return defaultBlogs;
-};
-
-export const saveBlogs = (blogs: Blog[]): void => {
-  localStorage.setItem('sanoop_blogs', JSON.stringify(blogs));
-};
+];

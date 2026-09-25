@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Mail, Linkedin, Github, Instagram, Code, Monitor, Smartphone, Layers, Cpu, Gamepad2, Trophy, Dices, Puzzle, Joystick, Briefcase, ExternalLink, Info, Layout as LayoutIcon, Database, BookOpen } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Mail, Linkedin, Github, Instagram, Code, Monitor, Smartphone, Layers, Cpu, Briefcase, ExternalLink, Info, Layout as LayoutIcon, Database, BookOpen } from 'lucide-react';
 
-interface LayoutProps {
+export interface LayoutProps {
   children: React.ReactNode;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const location = useLocation();
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Ensure clean single theme
@@ -31,17 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, []);
 
   const getFloatingIcons = () => {
-    if (location.pathname === '/fun') {
-      return (
-        <>
-          <Gamepad2 className="f-icon" />
-          <Trophy className="f-icon" />
-          <Dices className="f-icon" />
-          <Puzzle className="f-icon" />
-          <Joystick className="f-icon" />
-        </>
-      );
-    } else if (location.pathname.startsWith('/projects')) {
+    if (location.pathname.startsWith('/projects')) {
       return (
         <>
           <Briefcase className="f-icon" />
@@ -80,14 +69,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       <header>
         <nav className="container">
-          <Link 
-            to="/" 
-            className="logo"
-            onDoubleClick={(e) => {
-              e.preventDefault();
-              navigate('/admin');
-            }}
-          >
+          <Link to="/" className="logo">
             SANOOP DAS M<span className="logo-dot">.</span>
           </Link>
           <ul className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
@@ -96,8 +78,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <li><Link to="/#experience" onClick={() => setIsMenuOpen(false)}>Experience</Link></li>
             <li><Link to="/#skills" onClick={() => setIsMenuOpen(false)}>Skills</Link></li>
             <li><Link to="/#projects" onClick={() => setIsMenuOpen(false)}>Projects</Link></li>
-            <li><Link to="/#blog" onClick={() => setIsMenuOpen(false)}>Blog</Link></li>
-            <li><Link to="/fun" onClick={() => setIsMenuOpen(false)}>Fun</Link></li>
+            <li><Link to="/#blogs" onClick={() => setIsMenuOpen(false)}>Blog</Link></li>
             <li><Link to="/#contact" onClick={() => setIsMenuOpen(false)}>Contact</Link></li>
           </ul>
           <div style={{ display: 'flex', alignItems: 'center' }}>

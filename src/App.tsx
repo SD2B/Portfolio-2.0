@@ -2,9 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
-import Fun from './pages/Fun';
 import ProjectDetails from './pages/ProjectDetails';
-import Admin from './pages/Admin';
 
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
@@ -32,9 +30,7 @@ const App: React.FC = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/fun" element={<Fun />} />
           <Route path="/projects/:id" element={<ProjectDetails />} />
-          <Route path="/admin" element={<Admin />} />
         </Routes>
       </Layout>
     </Router>

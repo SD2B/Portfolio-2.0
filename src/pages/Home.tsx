@@ -1,21 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Mail, Phone, Linkedin, Github, Instagram, BookOpen, ExternalLink } from 'lucide-react';
+import { Mail, Phone, Linkedin, Github, Instagram, BookOpen, ExternalLink, Calendar, Clock, Tag } from 'lucide-react';
 import portraitImg from '../assets/images/profile.jpg';
 import { projects } from '../data/projects';
-import { fetchBlogs, getBlogs, Blog } from '../data/blogs';
 import { experiences, calculateExperienceStats } from '../data/experience';
+import { blogs } from '../data/blogs';
 
 const Home: React.FC = () => {
-  const [blogs, setBlogs] = useState<Blog[]>(getBlogs());
   const experienceStats = useMemo(() => calculateExperienceStats(experiences), []);
-
-  useEffect(() => {
-    fetchBlogs().then(data => {
-      if (data) setBlogs(data);
-    });
-  }, []);
 
   const revealVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -273,22 +266,8 @@ const Home: React.FC = () => {
         </motion.div>
       </section>
 
-      <section id="fun-link" className="section">
-        <motion.div 
-          className="container" 
-          style={{ textAlign: 'center' }}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={revealVariants}
-        >
-          <h2 className="section-title">Fun Zone</h2>
-          <p>Take a break and play some games I've built.</p>
-          <Link to="/fun" className="btn">Go to Fun Zone</Link>
-        </motion.div>
-      </section>
-
-      <section id="blog" className="section">
+      {/* Blogs & Engineering Articles Section */}
+      <section id="blogs" className="section">
         <motion.div 
           className="container"
           initial="hidden"
@@ -296,56 +275,97 @@ const Home: React.FC = () => {
           viewport={{ once: true }}
           variants={revealVariants}
         >
-          <h2 className="section-title">Latest Articles</h2>
-          <p className="section-subtitle">Insights and thoughts on Flutter, Dart, and multi-platform development.</p>
-          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '2.5rem' }}>
+            <div>
+              <h2 className="section-title">Technical Articles & Insights</h2>
+              <p className="section-subtitle">
+                Original deep-dives into Flutter internals, multi-threading, concurrency, state management, and software engineering.
+              </p>
+            </div>
+            <a 
+              href="https://medium.com/@sd2b" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="blog-action-btn primary"
+              style={{ marginTop: '0.5rem' }}
+            >
+              <BookOpen size={16} />
+              <span>Follow on Medium</span>
+              <ExternalLink size={14} />
+            </a>
+          </div>
+
+          {/* Blog Cards Grid */}
           <motion.div 
-            className="blog-grid grid"
+            className="blog-grid"
             variants={staggerContainer}
           >
             {blogs.map((blog) => (
-              <motion.div key={blog.id} variants={staggerItem}>
-                <a href={blog.url} target="_blank" rel="noopener noreferrer" className="blog-card-link">
-                  <div className="blog-card shine-effect">
-                    {blog.imageUrl && (
-                      <div className="blog-card-img-container">
-                        <img 
-                          src={blog.imageUrl} 
-                          alt={blog.title} 
-                          className="blog-card-img" 
-                          onError={(e) => {
-                            // If the image fails to load, hide or replace with placeholder
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
-                    )}
-                    <div className="blog-card-body">
-                      <div>
-                        <div className="blog-meta">
-                          <span>{blog.date}</span>
-                          <span className="blog-dot">&bull;</span>
-                          <span>{blog.readTime}</span>
-                        </div>
-                        <h3>{blog.title}</h3>
-                        <p>{blog.description}</p>
-                      </div>
-                      <span className="blog-link">
-                        Read on Medium <ExternalLink size={14} style={{ display: 'inline', marginLeft: '4px', verticalAlign: 'middle' }} />
-                      </span>
+              <motion.a 
+                key={blog.id} 
+                href={blog.mediumUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="blog-card blog-card-link"
+                variants={staggerItem}
+                title={`Read "${blog.title}" on Medium`}
+              >
+                {blog.coverImage && (
+                  <div className="blog-card-img-container">
+                    <img 
+                      src={blog.coverImage} 
+                      alt={blog.title} 
+                      className="blog-card-img" 
+                      loading="lazy"
+                    />
+                    <div className="blog-read-badge">
+                      <Clock size={12} />
+                      <span>{blog.readTime}</span>
                     </div>
                   </div>
-                </a>
-              </motion.div>
+                )}
+
+                <div className="blog-card-body">
+                  <div>
+                    <div className="blog-meta">
+                      <Calendar size={13} />
+                      <span>{blog.date}</span>
+                      <span className="blog-dot">&bull;</span>
+                      <span>Sanoop Das M</span>
+                    </div>
+
+                    <div className="blog-tags-row">
+                      {blog.tags.slice(0, 3).map((tag) => (
+                        <span key={tag} className="blog-tag-badge">
+                          <Tag size={10} />
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    <h3>{blog.title}</h3>
+                    <p>{blog.summary}</p>
+                  </div>
+
+                  <div className="blog-card-actions">
+                    <span className="blog-btn-medium-read">
+                      Read on Medium <ExternalLink size={14} />
+                    </span>
+                  </div>
+                </div>
+              </motion.a>
             ))}
           </motion.div>
 
-          {blogs.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '3rem', background: 'var(--gray)', borderRadius: '1rem' }}>
-              <p style={{ color: 'var(--accent)', margin: 0 }}>No articles posted yet. Check back soon!</p>
-            </div>
-          )}
+          <div style={{ marginTop: '2.5rem', textAlign: 'center' }}>
+            <p style={{ color: 'var(--muted)', fontSize: '0.95rem' }}>
+              Want to discuss technical architecture or collaborate?{' '}
+              <a href="https://medium.com/@sd2b" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--crimson)', fontWeight: 600, textDecoration: 'underline' }}>
+                Follow @sd2b on Medium
+              </a>{' '}
+              or reach out via the contact section below.
+            </p>
+          </div>
         </motion.div>
       </section>
 

@@ -65,7 +65,7 @@ export const experiences: ExperienceItem[] = [
 /**
  * Parses date in MM/YYYY format into month index (0-based total months from year 0)
  */
-function parseDateStringToMonthIndex(dateStr: string, isEnd = false): number {
+function parseDateStringToMonthIndex(dateStr: string): number {
   const trimmed = dateStr.trim().toLowerCase();
   const now = new Date();
   
@@ -134,8 +134,8 @@ export function calculateExperienceStats(items: ExperienceItem[] = experiences):
       }
     }
 
-    const startIdx = parseDateStringToMonthIndex(startStr, false);
-    const endIdx = parseDateStringToMonthIndex(endStr, true);
+    const startIdx = parseDateStringToMonthIndex(startStr);
+    const endIdx = parseDateStringToMonthIndex(endStr);
 
     const minIdx = Math.min(startIdx, endIdx);
     const maxIdx = Math.max(startIdx, endIdx);
