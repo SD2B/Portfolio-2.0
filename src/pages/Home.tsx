@@ -67,7 +67,7 @@ const Home: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <span className="hero-role">Multi-Platform Flutter Developer</span>
+              <span className="hero-role">Multi-Platform Software Developer</span>
               <h1>Crafting Seamless Experiences Across All Screens.</h1>
               <p>Hi, I'm Sanoop Das M. I specialize in building high-performance applications for Windows, macOS, Web, Android, and iOS using Flutter.</p>
               <div className="hero-platforms">
@@ -175,13 +175,11 @@ const Home: React.FC = () => {
               <h3>Master of Computer Applications (MCA)</h3>
               <p className="education-place">Hindusthan College of Engineering and Technology | Coimbatore</p>
               <span className="education-date">Completed: 04/2023</span>
-              <p className="education-score">Score: 75.4%</p>
             </div>
             <div className="education-card shine-effect">
               <h3>BSc. Computer Science</h3>
               <p className="education-place">KR’s Sree Narayana College | Malappuram</p>
               <span className="education-date">Completed: 11/2020</span>
-              <p className="education-score">Score: 54.6%</p>
             </div>
           </div>
         </motion.div>
@@ -239,7 +237,17 @@ const Home: React.FC = () => {
           >
             {Object.values(projects).map((project) => (
               <motion.div key={project.id} variants={staggerItem}>
-                <Link to={`/projects/${project.id}`} className="project-card-link">
+                <Link 
+                  to={`/projects/${project.id}`} 
+                  className="project-card-link"
+                  onClick={() => {
+                    try {
+                      sessionStorage.setItem('scroll_/', window.scrollY.toString());
+                    } catch {
+                      // ignore
+                    }
+                  }}
+                >
                   <div className="project-card shine-effect">
                     <h3>{project.title}</h3>
                     <p>{project.description}</p>
@@ -257,10 +265,10 @@ const Home: React.FC = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.5 }}
           >
-            <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>I also contribute to the Flutter ecosystem with open-source plugins.</p>
+            <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>I also contribute to the Flutter community with open-source plugins and packages.</p>
             <a href="https://pub.dev/publishers/sanoop.dev/packages" target="_blank" rel="noopener noreferrer" className="btn shine-effect" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
               <BookOpen size={20} />
-              View My Flutter Plugins on Pub.dev
+              View My Flutter Plugins & Packages on Pub.dev
             </a>
           </motion.div>
         </motion.div>

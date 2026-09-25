@@ -11,6 +11,23 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const location = useLocation();
 
+  const handleNavClick = (sectionId: string) => {
+    setIsMenuOpen(false);
+    if (location.pathname === '/') {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  const handleLogoClick = () => {
+    setIsMenuOpen(false);
+    if (location.pathname === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   useEffect(() => {
     // Ensure clean single theme
     document.documentElement.removeAttribute('data-theme');
@@ -69,17 +86,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       <header>
         <nav className="container">
-          <Link to="/" className="logo">
+          <Link to="/" className="logo" onClick={handleLogoClick}>
             SANOOP DAS M<span className="logo-dot">.</span>
           </Link>
           <ul className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
-            <li><Link to="/#hero" onClick={() => setIsMenuOpen(false)}>Home</Link></li>
-            <li><Link to="/#about" onClick={() => setIsMenuOpen(false)}>About</Link></li>
-            <li><Link to="/#experience" onClick={() => setIsMenuOpen(false)}>Experience</Link></li>
-            <li><Link to="/#skills" onClick={() => setIsMenuOpen(false)}>Skills</Link></li>
-            <li><Link to="/#projects" onClick={() => setIsMenuOpen(false)}>Projects</Link></li>
-            <li><Link to="/#blogs" onClick={() => setIsMenuOpen(false)}>Blog</Link></li>
-            <li><Link to="/#contact" onClick={() => setIsMenuOpen(false)}>Contact</Link></li>
+            <li><Link to="/#hero" onClick={() => handleNavClick('hero')}>Home</Link></li>
+            <li><Link to="/#about" onClick={() => handleNavClick('about')}>About</Link></li>
+            <li><Link to="/#experience" onClick={() => handleNavClick('experience')}>Experience</Link></li>
+            <li><Link to="/#skills" onClick={() => handleNavClick('skills')}>Skills</Link></li>
+            <li><Link to="/#projects" onClick={() => handleNavClick('projects')}>Projects</Link></li>
+            <li><Link to="/#blogs" onClick={() => handleNavClick('blogs')}>Blog</Link></li>
+            <li><Link to="/#contact" onClick={() => handleNavClick('contact')}>Contact</Link></li>
           </ul>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div className="mobile-menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>

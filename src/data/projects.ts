@@ -72,17 +72,6 @@ export const projects: Record<string, Project> = {
       'SincA Leads — Lead management software (Android, iOS, Web); sole frontend developer, paired with one backend developer.'
     ],
     tech: ['Flutter', 'Riverpod', 'MVVM', 'SQLite', 'WebSocket', 'Firebase', 'Dio']
-  },
-  'flutter-plugins': {
-    id: 'flutter-plugins',
-    title: 'Flutter Plugins & Packages',
-    description: 'Open-source and internal Flutter packages to enhance development efficiency and UI capabilities.',
-    details: [
-      'Custom Overlay Popup: A flexible package for creating customizable overlay popups.',
-      'Smart Wrap: Widget supporting responsive layouts for adaptive UI design.',
-      'Smart Tip: Tooltip widget enabling rich, context-sensitive UI elements.',
-      'Page Flow: Enables seamless navigation within a single ScrollView.'
-    ],
-    tech: ['Flutter', 'Dart', 'Open Source', 'Pub.dev']
   }
 };
+

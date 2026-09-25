@@ -8,7 +8,7 @@
 }
 
 html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
 }
 
 /* 2. Theme Variables - Matched directly to the pop-art portrait photo */
